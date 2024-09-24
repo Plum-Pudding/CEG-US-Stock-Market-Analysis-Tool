@@ -12,8 +12,9 @@ vendor_dir = os.path.join(parent_dir, "vendor");
 sys.path.append(vendor_dir);
 
 import vendor.requests; #Fucking stupid way of doing this but Python can't find the source and the above code isn't working
-import vendor.plotly;
+#Removed plotly-- see changelog
 import vendor.PyQt6;
+import vendor.pyqtgraph;
 
 #internal 
 import utilAPI;
@@ -22,7 +23,7 @@ import stockPrediction;
 
 def main():
     #TODO: Learn how to use PyQt6 GUI library (GPL v3 license)
-    #TODO: Check out Plotly as a lib for drawing graphs (MIT license)
+    #TODO: Check out pyqtgraph as a lib for drawing graphs (MIT license)
 
 
 
