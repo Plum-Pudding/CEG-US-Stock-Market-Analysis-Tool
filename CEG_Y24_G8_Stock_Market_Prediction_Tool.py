@@ -11,13 +11,14 @@ import math;
 
 import vendor.requests.src.requests as requests; #Fucking stupid way of doing this but Python can't find the source and the above code isn't working
 #Removed plotly-- see changelog
-import vendor.PyQt6 as Qt6;
+import vendor.PyQt6.sip as Qt6;
 import vendor.pyqtgraph as QtGraph;
 
 #internal 
 import utilAPI;
 import utilStockAnalysis;
 import stockPrediction;
+
 
 #online sources for data
 import yfinance as yfin;
@@ -33,6 +34,14 @@ def main():
 
     #Start GUI
 
+
+    class MyApp(Qt6.sip.QWidget):
+        def __init__(self):
+            super().__init__()
+            self.setWindowTitle('Hello There')
+            self.setWindowIcon(Qt6.sip.QIcon('maps.ico'))
+            self.resize(300,200) #width height
+        pass
 
 
     print("sus");
