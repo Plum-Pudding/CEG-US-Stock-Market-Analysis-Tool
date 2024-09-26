@@ -25,7 +25,7 @@ def main():
     #TODO: Learn how to use PyQt6 GUI library (GPL v3 license)
     #TODO: Check out pyqtgraph as a lib for drawing graphs (MIT license)
 
-    #todo: test
+    #todo: sample 
 
 
     #Start GUI
