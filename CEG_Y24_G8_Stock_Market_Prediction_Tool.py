@@ -13,6 +13,8 @@ import vendor.requests.src.requests as requests; #Fucking stupid way of doing th
 #Removed plotly-- see changelog
 import vendor.PyQt6.sip as Qt6;
 import vendor.pyqtgraph as QtGraph;
+from vendor.PyQt6.sip.QtWidgets import qwidget;
+from vendor.PyQt6.sip.QtGui import qicon;
 
 #internal 
 import utilAPI;
@@ -21,7 +23,7 @@ import stockPrediction;
 
 
 #online sources for data
-import yfinance as yfin;
+import vendor.yfinance as yfin;
 
 
 def main():
@@ -35,11 +37,11 @@ def main():
     #Start GUI
 
 
-    class MyApp(Qt6.sip.QWidget):
+    class MyApp(qwidget):
         def __init__(self):
             super().__init__()
             self.setWindowTitle('Hello There')
-            self.setWindowIcon(Qt6.sip.QIcon('maps.ico'))
+            self.setWindowIcon(qicon('maps.ico'))
             self.resize(300,200) #width height
         pass
 
