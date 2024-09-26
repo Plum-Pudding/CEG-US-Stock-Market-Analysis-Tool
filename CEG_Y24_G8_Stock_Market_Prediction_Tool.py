@@ -19,6 +19,10 @@ import utilAPI;
 import utilStockAnalysis;
 import stockPrediction;
 
+#online sources for data
+import yfinance as yfin;
+
+
 def main():
     #TODO: Learn how to use PyQt6 GUI library (GPL v3 license)
     #TODO: Check out pyqtgraph as a lib for drawing graphs (MIT license)
