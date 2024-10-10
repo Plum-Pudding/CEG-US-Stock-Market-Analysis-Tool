@@ -9,15 +9,15 @@ def testGetRndInt():
     
     pass;
 
-def textYFin(stockCode):
+def yFinGetHist(stockCode, periodHist):
     stockCode = str(stockCode);
     testObj = yfin.Ticker(stockCode);
-    testObjHist = testObj.history(period="5d")
-    #print(testObjHist);
+    testObjHist = testObj.history(interval="1d", period=periodHist)
+    print(testObjHist);
 
     return(testObjHist);
 
-    print("sample text");
+    #print("sample text");
 
 def testFunc():
     return 0;

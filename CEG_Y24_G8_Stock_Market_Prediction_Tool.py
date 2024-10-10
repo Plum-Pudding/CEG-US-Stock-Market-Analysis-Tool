@@ -11,10 +11,13 @@ import webbrowser;
 
 import PyQt6 as Qt6; #Backwards compat
 import pyqtgraph as QtGraph; #Backwards compat
+from pyqtgraph import GraphicsLayout, PlotWidget, mkPen;
 from PyQt6.QtWidgets import QApplication, QHBoxLayout, QMainWindow, QPushButton, QStackedLayout, QVBoxLayout, QWidget, QTabWidget;
 from PyQt6.QtGui import QPalette, QColor;
 import requests;
 import yfinance as yfin; #Backwards compat
+import pandas;
+import numpy;
 
 
 #internal 
@@ -44,8 +47,19 @@ class colourTest(QWidget):
         self.setPalette(paletteA);
 
 def main1():
-    #Sort out yFinance stuff
-    
+    #Retrieve test stock data
+    testDataHist = pandas.DataFrame();
+    testDataHist = utilAPI.yFinGetHist("TSLA","1wk");
+
+    testDataHistList_Closing = testDataHist["Close"].values.tolist();
+    #testDataHistList_Date = testDataHist[testDataHist.columns[0]].values.tolist(); #dates column is empty on row 0, "Date" on row 1, data on row 2 onwards
+    testDataHistList_Date = testDataHist.index.tolist(); #this might not work-- maybe use the current date and minus 1 per datapoint?
+
+    #del testDataHistList_Date[0];
+    #del testDataHistList_Date[0];
+
+    print(testDataHistList_Closing);
+    print(testDataHistList_Date);
 
     #Start GUI
     
@@ -66,12 +80,11 @@ def main1():
         def __init__(self):
             super(mainWindow, self).__init__()
 
-            
-
             #Layouts
             layoutA = QHBoxLayout();
             layoutB = QVBoxLayout();
             layoutC = QHBoxLayout();
+            layoutD = QHBoxLayout();
 
             #Colour box test widgets
             colourA = colourTest("red");
@@ -88,25 +101,53 @@ def main1():
             mainTabs.setTabPosition(QTabWidget.TabPosition.West);
             mainTabs.setMovable(True);
 
+            #Graph colours and pens
+            #pen1 = mkPen("red", 2);
+
+            #Graph plotting test
+            dataTest1 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,16];
+            dataTest2 = [1,4,2,15,3,3,5,12,7,14,0,5,5,1,2];
+            dataTest3 = [21,3,2,5,6,62,47,9,3,6,32,14,21,2,5]; 
+            graph1 = PlotWidget();
+            graph2 = PlotWidget();
+            graph3 = PlotWidget();
+            graph1.plot(dataTest1, dataTest2);
+            graph2.plot(dataTest1, dataTest3);
+            graph3.plot(dataTest1, dataTest2);
+
+            #Graph plotting with real data
+            #fin1Ticker = utilAPI.textYFin("AAPL", "5d")
+            #dataFin1Axis1 = fin1Ticker.to_numpy();
+
+
+            graphA = PlotWidget();
+            graphA.plot(y=testDataHistList_Closing, pen=(64, 102, 255)) #todo: change this to use real data
+            #graphA.
+
             #Setting layouts
             layoutB.addWidget(colourC);
-            layoutB.addWidget(colourD);
+            layoutB.addWidget(graph2);
+            layoutB.addWidget(colourE);
+            layoutB.addWidget(graph1);
+            layoutB.addWidget(colourTest("red"));
 
             layoutA.addLayout(layoutB);
 
-            layoutA.addWidget(colourA);
+            layoutA.addWidget(graph3);
             #layoutA.addWidget(colourB);
 
-            layoutC.addWidget(colourF);
-            layoutC.addWidget(colourG);
+            layoutC.addWidget(colourTest("red"));
+            layoutC.addWidget(colourTest("orange"));
 
-            #layoutB.addLayout(layoutA);
+            layoutD.addWidget(graphA);
 
             #Individual tab widgets
             tab1 = QWidget();
             tab2 = QWidget();
+            tab3 = QWidget();
             tab1.setLayout(layoutA);
             tab2.setLayout(layoutC);
+            tab3.setLayout(layoutD);
 
             #Assigning widgets to tabs, tab properties
             tab1.setAutoFillBackground(True);
@@ -121,6 +162,7 @@ def main1():
 
             mainTabs.addTab(tab1, "tab1"); #set tab1 widget as first tab, tab2 as second tab for mainTabs widget
             mainTabs.addTab(tab2, "tab2");
+            mainTabs.addTab(tab3, "tab3");
 
             #Test button widget
             buttonAble = QPushButton(buttonAbleLabel);
@@ -139,7 +181,7 @@ def main1():
 
             #mainWidget = QWidget();
             #mainWidget.setLayout(   );
-            self.setCentralWidget(mainTabs);
+            self.setCentralWidget(mainTabs); #set this back to mainTabs after testing
 
 
         def buttonAbleClicked(self):
@@ -151,9 +193,8 @@ def main1():
     #Start event loop
     appMain.exec();
 
-    
 
-    print("Hello there");
+    print("End");
     pass;
 
 
