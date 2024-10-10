@@ -2,6 +2,7 @@
 import os;
 import sys;
 import math;
+import webbrowser; 
 
 #vendor libraries
 #parent_dir = os.path.abspath(os.path.dirname(__file__));
@@ -44,6 +45,7 @@ def main():
             self.setWindowIcon(qicon('maps.ico'))
             self.resize(300,200) #width height
         pass
+
 
 
     print("sus");
