@@ -33,7 +33,7 @@ class myApp(QWidget):
         # widgets settings
         self.setWindowTitle("Stocks Viewer")
         self.setWindowIcon(QIcon('icons/barcharticon.png'))
-        self.resize(1000,650) # width, height
+        self.resize(1500,850) # width, height
 
         # Main Layout
         layout = QVBoxLayout()

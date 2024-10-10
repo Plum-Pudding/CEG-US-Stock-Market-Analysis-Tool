@@ -24,6 +24,8 @@ class MainPage(QWidget):
         layout = QVBoxLayout()
         dropdown_layout = QHBoxLayout()
         ticker_period_label_layout = QHBoxLayout()
+        evaluation_layout = QVBoxLayout()
+        summary_layout = QVBoxLayout()
 
         # dropdown list to select ticker
         self.ticker_combo = QComboBox()
@@ -33,12 +35,29 @@ class MainPage(QWidget):
         # dropdown list to select period
         self.period_combo = QComboBox()
         period = self.adjust_period('keys')
-        period_values = self.adjust_period('values')
         self.period_combo.addItems(period)
 
         # just a label
         self.label = QLabel('Select a stock to view data')
         self.period_label = QLabel('Select period')
+
+        # evaluation label config
+        self.eval_label = QLabel()
+        self.eval_label.setWordWrap(True)
+        self.eval_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.eval_label.setMaximumWidth(1500)
+        self.eval_label.setStyleSheet('''
+            padding: 10px;
+            font-family: verdana;
+            font-weight: bold;                  
+        ''')
+
+        # summary label config
+        self.summary_label = QLabel()
+        self.summary_label.setWordWrap(True)
+        self.summary_label.setAlignment(Qt.AlignmentFlag.AlignJustify)
+        self.summary_label.setMaximumWidth(1500)
+        self.summary_label.setStyleSheet("padding: 10px;")
 
         # button to plot stock data
         self.plotButton = QPushButton('Plot Stock Data')
@@ -59,37 +78,50 @@ class MainPage(QWidget):
         # click button to connect to get stock data
         self.plotButton.clicked.connect(self.plot_stock_data)
 
-        # layout section to add widgets. (add widgets to QVBoxLayout)
+
+        ''' layout section to add widgets. (add widgets to QVBoxLayout and make them appear) '''
+        # graph layout
         layout.addWidget(self.canvas)
 
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+
+        scroll_widget = QWidget()
+        scroll_layout = QVBoxLayout(scroll_widget)
+
+        # layout for dropdown ticker menu
         dropdown_layout.addWidget(self.ticker_combo)
         dropdown_layout.addWidget(self.period_combo)
-        layout.addLayout(dropdown_layout)
+        scroll_layout.addLayout(dropdown_layout)
 
+        # layout for dropdown period menu
         ticker_period_label_layout.addWidget(self.label)
         ticker_period_label_layout.addWidget(self.period_label)
-        layout.addLayout(ticker_period_label_layout)
+        scroll_layout.addLayout(ticker_period_label_layout)
 
-        layout.addWidget(self.plotButton)
+        # plot button layout
+        scroll_layout.addWidget(self.plotButton)
+    
+        # evaluation section
+        self.setLayout(evaluation_layout)
+        evaluation_layout.addWidget(self.eval_label)
+        scroll_layout.addLayout(evaluation_layout)
 
+        # summary section
+        self.setLayout(summary_layout)
+        summary_layout.addWidget(self.summary_label)
+        scroll_layout.addLayout(summary_layout)
+        
+        scroll_area.setWidget(scroll_widget)
+        layout.addWidget(scroll_area)
+        # scroll_area.setWidget(self.summary_label)
 
     def get_stock_tickers(self):
         # fetch tickers from data source dynamically. currently a predefined list
         tickers = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA', 'AMD', 'INTC', 'META', 'JPM', 'V', 'JNJ', 'PG', 'KO', 'PFE', 'XOM', 'DIS', 'PEP', 'T', 'NFLX']
         sorted_tickers = sorted(tickers)
         return sorted(sorted_tickers)
-    
-    def get_stock_fullnames(self):
-        # tickers from yfinance API
-        tickers = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA', 'AMD', 'INTC', 'META', 'JPM', 'V', 'JNJ', 'PG', 'KO', 'PFE', 'XOM', 'DIS', 'PEP', 'T', 'NFLX']
-        # empty list for full name of stock
-        stock_name_dic = {}
-        for ticker in tickers:
-            stock = yf.Ticker(ticker)
-            stock_info = stock.info
-            stock_name = stock_info['shortName']
-            stock_name_dic[ticker] = stock_name
-        return stock_name_dic
+
     
     def adjust_period(self, selection): # to showcase the period properly in full form
         # get the time period of stock performance over the days/months/years
@@ -101,10 +133,6 @@ class MainPage(QWidget):
             return list(period_dict.values())
         elif selection == 'all':
             return period_dict
-
-        # return['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max']
-
-
 
     def plot_stock_data(self):
 
@@ -133,6 +161,16 @@ class MainPage(QWidget):
         ax.legend()
         self.canvas.draw()
 
+        # display buy evaluation
+        buy_evaluation = self.evaluate_stock_buy_quality(selected_stock)
+        # self.label.setText(buy_evaluation)
+        self.eval_label.setText(f'{buy_evaluation}')
+
+        # display stock information
+        stock_summary = stock_info.get('longBusinessSummary')
+        self.summary_label.setText(f'Company summary:\n{stock_summary}')
+
+
     def plot_bargraph_data(self):
         
         pass
@@ -150,5 +188,31 @@ class MainPage(QWidget):
         recommendations = stock.recommendations
 
         # Check if PE ratio is low
-        # if pe_ratio and pe
+        if pe_ratio and pe_ratio < 15:
+            buy_message = f"{ticker} has a low PE ratio ({pe_ratio}), potential good buy."
+        else:
+            buy_message = f"{ticker} has a high PE ratio ({pe_ratio}), be cautious."
+
+        # Check if the stock is near its 52-week low
+        if current_price and fifty_two_week_low and (current_price < fifty_two_week_low * 1.05):
+            buy_message += f"\n{ticker} is trading close to its 52-week low. This might be a good buying opportunity."
+
+        # Include analyst recommendations (if available)
+        if recommendations is not None:
+            recent_rec = recommendations.tail(1).iloc[0]
+            buys = recent_rec['strongBuy'] + recent_rec['buy']
+            sells = recent_rec['strongSell'] + recent_rec['sell']
+            if buys == 0 or sells == 0:
+                buys_ratioed = buys
+                sells_ratioed = sells
+            elif buys % sells == 0:
+                buys_ratioed = buys / sells
+                sells_ratioed = sells / sells
+            else:
+                buys_ratioed = buys
+                sells_ratioed = sells
+          
+            buy_message += f"\nLatest analyst recommendation on buys to sells ratio: {int(buys_ratioed)}:{int(sells_ratioed)} with {recent_rec['hold']} analysts on hold."
+
+        return buy_message
 
