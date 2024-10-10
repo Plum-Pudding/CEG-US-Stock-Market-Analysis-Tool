@@ -79,7 +79,19 @@ class MainPage(QWidget):
         sorted_tickers = sorted(tickers)
         return sorted(sorted_tickers)
     
-    def adjust_period(self, selection):
+    def get_stock_fullnames(self):
+        # tickers from yfinance API
+        tickers = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA', 'AMD', 'INTC', 'META', 'JPM', 'V', 'JNJ', 'PG', 'KO', 'PFE', 'XOM', 'DIS', 'PEP', 'T', 'NFLX']
+        # empty list for full name of stock
+        stock_name_dic = {}
+        for ticker in tickers:
+            stock = yf.Ticker(ticker)
+            stock_info = stock.info
+            stock_name = stock_info['shortName']
+            stock_name_dic[ticker] = stock_name
+        return stock_name_dic
+    
+    def adjust_period(self, selection): # to showcase the period properly in full form
         # get the time period of stock performance over the days/months/years
         period_dict = {'5d': '5 days', '1mo': '1 month', '3mo': '3 months', '6mo' : '6 months', '1y': '1 year', '2y' : '2 years', '5y' : '5 years', '10y' : '10 years', 'ytd' : 'year-to-date', 'max':'maximum data'}
 
@@ -95,10 +107,17 @@ class MainPage(QWidget):
 
 
     def plot_stock_data(self):
+
         selected_stock = self.ticker_combo.currentText() # pulls the stock selected in the dropdown list
-        self.label.setText(f'Stock Selected: {selected_stock}')
+        stock = yf.Ticker(selected_stock)
+        stock_info = stock.info
+        self.label.setText(f'Stock Selected: {selected_stock}') # callback to yf Ticker info to get longname to display proper name instead of Ticker symbol
         selected_period = self.period_combo.currentText() # pulls the period selected in the dropdown list
-        self.period_label.setText(f'Period: {selected_period}')
+        for key, value  in self.adjust_period('all').items(): # to get the graph label to show the period properly
+            if selected_period == key:
+                period_full = value
+        self.period_label.setText(f'Period: {period_full}')
+
 
         # historical data for selected stock. 1mo = 30/31 days, 1y = 1 year, max: from the beginning
         stock = yf.Ticker(selected_stock)
@@ -108,7 +127,7 @@ class MainPage(QWidget):
         self.canvas.figure.clear()
         ax = self.canvas.figure.add_subplot(111)
         ax.plot(history.index, history['Close'], label = 'Close Price')
-        ax.set_title(f"{selected_stock} Stock Price in {selected_period}")
+        ax.set_title(f"{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full}")
         ax.set_xlabel("Date")
         ax.set_ylabel("Close Price")
         ax.legend()

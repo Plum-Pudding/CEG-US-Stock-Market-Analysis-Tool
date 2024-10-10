@@ -116,13 +116,23 @@ class ComparePage(QWidget):
 
 
     def plot_stock_data(self):
+
         selected_ticker1 = self.ticker1_combo.currentText()
-        self.label1.setText(f'{selected_ticker1}')
+        stock_name1 = yf.Ticker(selected_ticker1)
+        stock_info1 = stock_name1.info
+        self.label1.setText(f'Stock 1: {selected_ticker1}')
+
         selected_ticker2 = self.ticker2_combo.currentText()
-        self.label2.setText(f'{selected_ticker2}')
+        stock_name2 = yf.Ticker(selected_ticker2)
+        stock_info2 = stock_name2.info
+        self.label2.setText(f'Stock 2: {selected_ticker2}')
 
         selected_period = self.period_combo.currentText()
-        self.period_label.setText(f'{selected_period}')
+        # making the period label neater to show full period
+        for key, value  in self.adjust_period('all').items(): # to get the graph label to show the period properly
+            if selected_period == key:
+                period_full = value
+        self.period_label.setText(f'{period_full}')
 
         # Historical data for selected stock
         stock1 = yf.Ticker(selected_ticker1).history(period = selected_period)
@@ -133,14 +143,14 @@ class ComparePage(QWidget):
         # self.canvas.figure.clear()
         fig1, ax1 = plt.subplots()
         ax1.plot(stock1.index, stock1['Close'], label =f'{selected_ticker1} Close Price')
-        ax1.set_title(f'{selected_ticker1} Stock Price in {selected_period}')
+        ax1.set_title(f'{stock_info1.get('longName')} Stock Price in {period_full}')
         ax1.set_xlabel('Date')
         ax1.set_ylabel('Close Price')
         ax1.legend()
         
         fig2, ax2 = plt.subplots()
         ax2.plot(stock2.index, stock2['Close'], label = f'{selected_ticker2} Close Price')
-        ax2.set_title(f'{selected_ticker2} Stock Price in {selected_period}')
+        ax2.set_title(f'{stock_info2.get('longName')} Stock Price in {period_full}')
         ax2.set_xlabel('Date')
         ax2.set_ylabel('Close Price')
         ax2.legend()
