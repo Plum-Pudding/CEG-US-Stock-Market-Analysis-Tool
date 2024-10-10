@@ -13,7 +13,7 @@ import PyQt6 as Qt6; #Backwards compat
 import pyqtgraph as QtGraph; #Backwards compat
 from pyqtgraph import GraphicsLayout, PlotWidget, mkPen;
 from PyQt6.QtWidgets import QApplication, QHBoxLayout, QMainWindow, QPushButton, QStackedLayout, QVBoxLayout, QWidget, QTabWidget;
-from PyQt6.QtGui import QPalette, QColor;
+from PyQt6.QtGui import QPalette, QColor, QIcon;
 import requests;
 import yfinance as yfin; #Backwards compat
 import pandas;
@@ -61,9 +61,19 @@ def main1():
     print(testDataHistList_Closing);
     print(testDataHistList_Date);
 
-    #Start GUI
+    #TODO: Add user input textbox to enter stock ticker symbols (AAPL, TSLA, etc), button to confirm, textboxes for period 
+    #TODO: Ticker symbol validation using the csv.
+    #TODO: Add events so that confirmation of valid ticker symbol adds another graph to the left column, or alternatively to the right coloumn
+    #TODO: Different views for tab 2 and 3. (Single stock detailed view with numbers, single stock analysis with prediction)
+    #TODO: Display current price of stock, daily gain/loss
+    #TODO: Calculate and display historical gain/loss, mean, amplitude and all that etc.
+    #TODO: Display dividends also ^
+    #TODO: Toggle button and slider to display moving-average graph instead, with slider to control order of average
+    #TODO: Check if I'm missing anything :)
+
+
     
-    
+    #Start GUI vvv
 
     #appMain is the main QApplication class
     appMain = QApplication(sys.argv)
@@ -80,7 +90,7 @@ def main1():
         def __init__(self):
             super(mainWindow, self).__init__()
 
-            #Layouts
+            #Layouts pre-declaration
             layoutA = QHBoxLayout();
             layoutB = QVBoxLayout();
             layoutC = QHBoxLayout();
@@ -95,6 +105,9 @@ def main1():
             colourF = colourTest("blue");
             colourG = colourTest("magenta");
             colourH = colourTest("darkMagenta");
+
+            #User input widgets (Combo boxes etc)
+
 
             #Tabs widget
             mainTabs = QTabWidget();
@@ -173,6 +186,7 @@ def main1():
             self.setWindowTitle(windowTitle); #Set window title
             self.setMinimumSize(minWindowWidth, minWindowHeight); #Set minimum window dimensions
             self.setAutoFillBackground(True); #Auto fill widget background colour
+            self.setWindowIcon(QIcon('icons/barcharticon.png')) #icon courtesy of hadif
 
             paletteMain = self.palette(); 
             paletteMain.setColor(QPalette.ColorRole.Window, QColor(backgroundPalette)); #set widget palette to backgroundPalette hex code
