@@ -12,7 +12,8 @@ import webbrowser;
 import PyQt6 as Qt6; #Backwards compat
 import pyqtgraph as QtGraph; #Backwards compat
 from pyqtgraph import GraphicsLayout, PlotWidget, mkPen;
-from PyQt6.QtWidgets import QApplication, QHBoxLayout, QMainWindow, QPushButton, QStackedLayout, QVBoxLayout, QWidget, QTabWidget;
+from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QMainWindow, QMdiSubWindow, QPushButton, QStackedLayout, QVBoxLayout, QWidget, QTabWidget;
+from PyQt6 import QtCore;
 from PyQt6.QtGui import QPalette, QColor, QIcon;
 import requests;
 import yfinance as yfin; #Backwards compat
@@ -48,19 +49,17 @@ class colourTest(QWidget):
 
 def main1():
     #Retrieve test stock data
+    
     testDataHist = pandas.DataFrame();
-    testDataHist = utilAPI.yFinGetHist("TSLA","1wk");
+    testDataHist = utilAPI.yFinGetHist("TSLA","1d", "1d");
 
     testDataHistList_Closing = testDataHist["Close"].values.tolist();
     #testDataHistList_Date = testDataHist[testDataHist.columns[0]].values.tolist(); #dates column is empty on row 0, "Date" on row 1, data on row 2 onwards
-    testDataHistList_Date = testDataHist.index.tolist(); #this might not work-- maybe use the current date and minus 1 per datapoint?
-
-    #del testDataHistList_Date[0];
-    #del testDataHistList_Date[0];
+    testDataHistList_Date = testDataHist.index.tolist(); #this might not work, because data is in a funky format-- maybe use the brute force current date and minus 1 per datapoint?
 
     print(testDataHistList_Closing);
-    print(testDataHistList_Date);
-
+    print(testDataHistList_Date); #haha
+    
     #TODO: Add user input textbox to enter stock ticker symbols (AAPL, TSLA, etc), button to confirm, textboxes for period 
     #TODO: Ticker symbol validation using the csv.
     #TODO: Add events so that confirmation of valid ticker symbol adds another graph to the left column, or alternatively to the right coloumn
@@ -81,8 +80,8 @@ def main1():
     #Declaring some variables for the GUI properties
     windowTitle = "CEG Stock Anaylsis Tool";
     buttonAbleLabel = "Press test!";
-    minWindowHeight = 450;
-    minWindowWidth = 800;
+    minWindowHeight = 600;
+    minWindowWidth = 620;
     backgroundPalette = "#0e140f"; #hex code colour for background
     tabPalette = "#1a241c" #hex code code colour for tabs
 
@@ -90,21 +89,6 @@ def main1():
         def __init__(self):
             super(mainWindow, self).__init__()
 
-            #Layouts pre-declaration
-            layoutA = QHBoxLayout();
-            layoutB = QVBoxLayout();
-            layoutC = QHBoxLayout();
-            layoutD = QHBoxLayout();
-
-            #Colour box test widgets
-            colourA = colourTest("red");
-            colourB = colourTest("orange");
-            colourC = colourTest("yellow");
-            colourD = colourTest("green");
-            colourE = colourTest("cyan");
-            colourF = colourTest("blue");
-            colourG = colourTest("magenta");
-            colourH = colourTest("darkMagenta");
 
             #User input widgets (Combo boxes etc)
 
@@ -114,8 +98,9 @@ def main1():
             mainTabs.setTabPosition(QTabWidget.TabPosition.West);
             mainTabs.setMovable(True);
 
-            #Graph colours and pens
-            #pen1 = mkPen("red", 2);
+            #Dummy widget for setting gridsize
+            topLeftDummy = QWidget()
+            bottomRightDummy = QWidget();
 
             #Graph plotting test
             dataTest1 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,16];
@@ -124,9 +109,20 @@ def main1():
             graph1 = PlotWidget();
             graph2 = PlotWidget();
             graph3 = PlotWidget();
+            graph4 = PlotWidget();
+            graph5 = PlotWidget();
+            graph6 = PlotWidget();
             graph1.plot(dataTest1, dataTest2);
             graph2.plot(dataTest1, dataTest3);
             graph3.plot(dataTest1, dataTest2);
+            graph4.plot(dataTest1, dataTest2);
+            graph5.plot(dataTest1, dataTest2);
+            graph6.plot(dataTest1, dataTest2);
+
+            graphLayoutA = GraphicsLayout();
+            graphLayoutA.addPlot();
+            graphLayoutA.addLabel("test label");
+            graphLayoutA.addLabel("test label2", angle=-90);
 
             #Graph plotting with real data
             #fin1Ticker = utilAPI.textYFin("AAPL", "5d")
@@ -134,19 +130,27 @@ def main1():
 
 
             graphA = PlotWidget();
-            graphA.plot(y=testDataHistList_Closing, pen=(64, 102, 255)) #todo: change this to use real data
+            graphA.plot(y=testDataHistList_Closing, pen=(64, 102, 255))
             #graphA.
 
-            #Setting layouts
-            layoutB.addWidget(colourC);
-            layoutB.addWidget(graph2);
-            layoutB.addWidget(colourE);
+            #Layouts pre-declaration
+            #layoutA = QGridLayout(); #I have decided that grids are a nightmare 
+            layoutA = QHBoxLayout();
+            layoutB = QVBoxLayout();
+            layoutC = QHBoxLayout();
+            layoutD = QHBoxLayout();
+
+            #Setting 
             layoutB.addWidget(graph1);
-            layoutB.addWidget(colourTest("red"));
+            layoutB.addWidget(graph2);
+            layoutB.addWidget(graph3);
+            layoutB.addWidget(graph4);
+            layoutB.addWidget(graph5);
 
             layoutA.addLayout(layoutB);
-
-            layoutA.addWidget(graph3);
+            layoutA.addWidget(graphLayoutA);
+            
+            #layoutA.addWidget(graph6);
             #layoutA.addWidget(colourB);
 
             layoutC.addWidget(colourTest("red"));
@@ -197,7 +201,7 @@ def main1():
             #mainWidget.setLayout(   );
             self.setCentralWidget(mainTabs); #set this back to mainTabs after testing
 
-
+        #Events
         def buttonAbleClicked(self):
             print("Button Able clicked.");
 

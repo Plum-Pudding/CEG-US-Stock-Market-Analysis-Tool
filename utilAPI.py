@@ -9,11 +9,11 @@ def testGetRndInt():
     
     pass;
 
-def yFinGetHist(stockCode, periodHist):
+def yFinGetHist(stockCode, periodHist, intervalTime):
     stockCode = str(stockCode);
     testObj = yfin.Ticker(stockCode);
-    testObjHist = testObj.history(interval="1d", period=periodHist)
-    print(testObjHist);
+    testObjHist = testObj.history(interval=intervalTime, period=periodHist);
+    #print(testObjHist);
 
     return(testObjHist);
 
