@@ -75,11 +75,13 @@ class MainPage(QWidget):
 
     def get_stock_tickers(self):
         # fetch tickers from data source dynamically. currently a predefined list
-        return['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA', 'AMD', 'INTC']
+        tickers = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA', 'AMD', 'INTC', 'META', 'JPM', 'V', 'JNJ', 'PG', 'KO', 'PFE', 'XOM', 'DIS', 'PEP', 'T', 'NFLX']
+        sorted_tickers = sorted(tickers)
+        return sorted(sorted_tickers)
     
     def adjust_period(self, selection):
+        # get the time period of stock performance over the days/months/years
         period_dict = {'5d': '5 days', '1mo': '1 month', '3mo': '3 months', '6mo' : '6 months', '1y': '1 year', '2y' : '2 years', '5y' : '5 years', '10y' : '10 years', 'ytd' : 'year-to-date', 'max':'maximum data'}
-
 
         if selection == 'keys':
             return list(period_dict.keys())
@@ -89,6 +91,7 @@ class MainPage(QWidget):
             return period_dict
 
         # return['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max']
+
 
 
     def plot_stock_data(self):
@@ -114,4 +117,19 @@ class MainPage(QWidget):
     def plot_bargraph_data(self):
         
         pass
+
+    def evaluate_stock_buy_quality(self, ticker):
+        # Fetch stock information
+        stock = yf.Ticker(ticker)
+        stock_info = stock.info
+
+        # Criteria for stock to be "good buy"
+        pe_ratio = stock_info.get('forwardPE', None)
+        fifty_two_week_low = stock_info.get('fiftyTwoWeekLow', None)
+        fifty_two_week_high = stock_info.get('fiftyTwoWeekHigh', None)
+        current_price = stock_info.get('currentPrice', None)
+        recommendations = stock.recommendations
+
+        # Check if PE ratio is low
+        # if pe_ratio and pe
 
