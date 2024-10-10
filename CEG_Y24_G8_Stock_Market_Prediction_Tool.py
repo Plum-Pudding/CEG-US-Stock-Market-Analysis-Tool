@@ -36,7 +36,7 @@ import stockPrediction;
 #TODO: Check if everyone has the vEnv sorted
 #TODO: Check if the requirements.txt actually has everything, because I suspect it doesn't, despite the pip freeze
 
-def main():
+def main1():
     #Sort out yFinance stuff
     #print(utilAPI.textYFin("AAPL"));
     #print("Test:", utilAPI.testFunc())
@@ -87,4 +87,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main();
+    main1();
