@@ -17,7 +17,7 @@ import pandas_datareader as web
 import datetime as dt
 
 
-from sklearn.preprocessing import MinMaxScaler
+# from sklearn.preprocessing import MinMaxScaler
 # import tensorflow as tf
 # from tensorflow
 
