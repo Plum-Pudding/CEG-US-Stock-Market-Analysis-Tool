@@ -43,7 +43,7 @@ def main():
 
     #todo: sample 
 
-    utilAPI.testFunction()
+    # utilAPI.testFunction()
 
     #Start GUI
     
