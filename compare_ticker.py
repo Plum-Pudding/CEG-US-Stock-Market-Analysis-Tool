@@ -1,7 +1,7 @@
 import sys
 import PyQt6 as pyqt6
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QStackedWidget
+from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QStackedWidget, QScrollArea
 from PyQt6.QtGui import QIcon
 import pyqtgraph as pg
 
@@ -57,17 +57,19 @@ class ComparePage(QWidget):
 
         # just a label
         self.label1 = QLabel('Select a stock to view data')
-
         self.label2 = QLabel('Select a stock to view data')
-
         self.period_label = QLabel('Select period')
 
         # button to plot stock data
         self.plotButton = QPushButton('Plot Stock Data')
         self.plotButton.clicked.connect(self.plot_stock_data)
 
+        # self.canvas = FigureCanvas(plt.figure())
+
         # set layout to main window
         self.setLayout(layout)
+
+        # layout.addWidget(self.canvas)
 
         # side by side graphs layout
         self.figure_layout = QHBoxLayout()
@@ -95,11 +97,11 @@ class ComparePage(QWidget):
 
     def get_stock_tickers(self):
         # fetch tickers from data source dynamically. currently a predefined list
-        return['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN']
+        return['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA']
     
 
     def adjust_period(self, selection):
-        period_dict = {'1d' :'1 day', '5d': '5 days', '1mo': '1 month', '3mo': '3 months', '6mo' : '6 months', '1y': '1 year', '2y' : '2 years', '5y' : '5 years', '10y' : '10 years', 'ytd' : 'year-to-date', 'max':'maximum data'}
+        period_dict = {'5d': '5 days', '1mo': '1 month', '3mo': '3 months', '6mo' : '6 months', '1y': '1 year', '2y' : '2 years', '5y' : '5 years', '10y' : '10 years', 'ytd' : 'year-to-date', 'max':'maximum data'}
 
 
         if selection == 'keys':
@@ -127,7 +129,7 @@ class ComparePage(QWidget):
 
         # creating 2 plots for stock data
         self.clear_existing_charts()
-
+        # self.canvas.figure.clear()
         fig1, ax1 = plt.subplots()
         ax1.plot(stock1.index, stock1['Close'], label =f'{selected_ticker1} Close Price')
         ax1.set_title(f'{selected_ticker1} Stock Price in {selected_period}')
@@ -149,6 +151,7 @@ class ComparePage(QWidget):
         self.figure_layout.addWidget(canvas2)
 
         self.layout().update()
+        # self.canvas.draw()
 
     def clear_existing_charts(self):
         """Clear any existing charts before displaying new ones."""
