@@ -38,8 +38,8 @@ import stockPrediction;
 
 def main():
     #Sort out yFinance stuff
-    print(utilAPI.textYFin("AAPL"));
-    print("Test:", utilAPI.testFunc())
+    #print(utilAPI.textYFin("AAPL"));
+    #print("Test:", utilAPI.testFunc())
 
 
     #Start GUI
