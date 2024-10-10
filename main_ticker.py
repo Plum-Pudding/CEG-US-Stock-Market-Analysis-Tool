@@ -1,7 +1,7 @@
 import sys
 import PyQt6 as pyqt6
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QScrollArea
+from PyQt6.QtCore import Qt, QAbstractTableModel
+from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QScrollArea, QTableView
 from PyQt6.QtGui import QIcon
 import pyqtgraph as pg
 
@@ -26,6 +26,7 @@ class MainPage(QWidget):
         ticker_period_label_layout = QHBoxLayout()
         evaluation_layout = QVBoxLayout()
         summary_layout = QVBoxLayout()
+        hist_layout = QVBoxLayout()
 
         # dropdown list to select ticker
         self.ticker_combo = QComboBox()
@@ -150,14 +151,24 @@ class MainPage(QWidget):
         # historical data for selected stock. 1mo = 30/31 days, 1y = 1 year, max: from the beginning
         stock = yf.Ticker(selected_stock)
         history = stock.history(period = selected_period)
+        data = stock.history(period = selected_period)
+
+        # Calculate Simple Moving Averages (SMA)
+        data['SMA_10'] = data['Close'].rolling(window=10).mean()  # 10-day SMA
+        data['SMA_50'] = data['Close'].rolling(window=50).mean()  # 50-day SMA
+
+        data['EMA_10'] = data['Close'].ewm(span=10, adjust=False).mean()  # 10-day EMA
         
         # creating and plotting of graph
         self.canvas.figure.clear()
         ax = self.canvas.figure.add_subplot(111)
-        ax.plot(history.index, history['Close'], label = 'Close Price')
-        ax.set_title(f"{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full}")
-        ax.set_xlabel("Date")
-        ax.set_ylabel("Close Price")
+        ax.plot(history.index, history['Close'], label = 'Close Price', color='blue')
+        ax.plot(data.index, data['SMA_10'], label='10-Day SMA', color='red')
+        ax.plot(data.index, data['SMA_50'], label='50-Day SMA', color='green')
+        # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
+        ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full} with 10-Day and 50-Day Simple Moving Averages')
+        ax.set_xlabel('Date')
+        ax.set_ylabel('Close Price')
         ax.legend()
         self.canvas.draw()
 

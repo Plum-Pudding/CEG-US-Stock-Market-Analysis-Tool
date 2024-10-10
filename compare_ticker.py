@@ -1,7 +1,7 @@
 import sys
 import PyQt6 as pyqt6
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QStackedWidget, QScrollArea
+from PyQt6.QtCore import Qt, QAbstractTableModel
+from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QStackedWidget, QScrollArea, QTableView
 from PyQt6.QtGui import QIcon
 import pyqtgraph as pg
 
@@ -64,15 +64,15 @@ class ComparePage(QWidget):
         self.plotButton = QPushButton('Plot Stock Data')
         self.plotButton.clicked.connect(self.plot_stock_data)
 
-        # self.canvas = FigureCanvas(plt.figure())
+        self.canvas = FigureCanvas(plt.figure())
 
         # set layout to main window
         self.setLayout(layout)
 
-        # layout.addWidget(self.canvas)
 
         # side by side graphs layout
         self.figure_layout = QHBoxLayout()
+        self.figure_layout.addWidget(self.canvas)
         layout.addLayout(self.figure_layout)
 
         # layouts for dropdowns and button
@@ -117,17 +117,32 @@ class ComparePage(QWidget):
 
     def plot_stock_data(self):
 
+        selected_period = self.period_combo.currentText()
+
+        # historical data for selected stock. 1mo = 30/31 days, 1y = 1 year, max: from the beginning, 1st graph
         selected_ticker1 = self.ticker1_combo.currentText()
         stock_name1 = yf.Ticker(selected_ticker1)
         stock_info1 = stock_name1.info
         self.label1.setText(f'Stock 1: {selected_ticker1}')
+        data1 = stock_name1.history(period = selected_period)
 
+        # Calculate Simple Moving Averages (SMA) for 1st graph
+        data1['SMA_10'] = data1['Close'].rolling(window=10).mean()  # 10-day SMA
+        data1['SMA_50'] = data1['Close'].rolling(window=50).mean()  # 50-day SMA
+
+        data1['EMA_10'] = data1['Close'].ewm(span=10, adjust=False).mean()  # 10-day EMA
+
+        # historical data for 2nd graph
         selected_ticker2 = self.ticker2_combo.currentText()
         stock_name2 = yf.Ticker(selected_ticker2)
         stock_info2 = stock_name2.info
         self.label2.setText(f'Stock 2: {selected_ticker2}')
+        data2 = stock_name2.history(period = selected_period)
 
-        selected_period = self.period_combo.currentText()
+        # Calculate Simple Moving Averages (SMA) for 1st graph
+        data2['SMA_10'] = data2['Close'].rolling(window=10).mean()  # 10-day SMA
+        data2['SMA_50'] = data2['Close'].rolling(window=50).mean()  # 50-day SMA
+
         # making the period label neater to show full period
         for key, value  in self.adjust_period('all').items(): # to get the graph label to show the period properly
             if selected_period == key:
@@ -141,25 +156,35 @@ class ComparePage(QWidget):
         # creating 2 plots for stock data
         self.clear_existing_charts()
         # self.canvas.figure.clear()
-        fig1, ax1 = plt.subplots()
+        # fig1, ax1 = plt.subplots()
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+
         ax1.plot(stock1.index, stock1['Close'], label =f'{selected_ticker1} Close Price')
+        ax1.plot(data1.index, data1['SMA_10'], label='10-Day SMA', color='red')
+        ax1.plot(data1.index, data1['SMA_50'], label='50-Day SMA', color='green')
+        # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
         ax1.set_title(f'{stock_info1.get('longName')} Stock Price in {period_full}')
         ax1.set_xlabel('Date')
         ax1.set_ylabel('Close Price')
         ax1.legend()
         
-        fig2, ax2 = plt.subplots()
+        # fig2, ax2 = plt.subplots()
         ax2.plot(stock2.index, stock2['Close'], label = f'{selected_ticker2} Close Price')
+        ax2.plot(data2.index, data2['SMA_10'], label='10-Day SMA', color='red')
+        ax2.plot(data2.index, data2['SMA_50'], label='50-Day SMA', color='green')
+        # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
         ax2.set_title(f'{stock_info2.get('longName')} Stock Price in {period_full}')
         ax2.set_xlabel('Date')
         ax2.set_ylabel('Close Price')
         ax2.legend()
 
         # Plotting 2 graphs
-        canvas1 = FigureCanvas(fig1)
-        canvas2 = FigureCanvas(fig2)
-        self.figure_layout.addWidget(canvas1)
-        self.figure_layout.addWidget(canvas2)
+        # canvas1 = FigureCanvas(fig1)
+        # canvas2 = FigureCanvas(fig2)
+        canvas = FigureCanvas(fig)
+        self.figure_layout.addWidget(canvas)
+        # self.figure_layout.addWidget(canvas1)
+        # self.figure_layout.addWidget(canvas2)
 
         self.layout().update()
         # self.canvas.draw()
