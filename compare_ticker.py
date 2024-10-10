@@ -97,7 +97,7 @@ class ComparePage(QWidget):
 
     def get_stock_tickers(self):
         # fetch tickers from data source dynamically. currently a predefined list
-        return['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA']
+        return['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA', 'AMD', 'INTC']
     
 
     def adjust_period(self, selection):
