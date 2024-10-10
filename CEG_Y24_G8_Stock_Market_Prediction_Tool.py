@@ -8,7 +8,6 @@ import vendor.plotly;
 #vendor libraries
 parent_dir = os.path.abspath(os.path.dirname(__file__));
 vendor_dir = os.path.join(parent_dir, "vendor");
-
 sys.path.append(vendor_dir);
 
 import vendor.requests; #Fucking stupid way of doing this but Python can't find the source and the above code isn't working
@@ -27,6 +26,7 @@ def main():
 
     #todo: sample 
 
+    utilAPI.testFunction()
 
     #Start GUI
 
