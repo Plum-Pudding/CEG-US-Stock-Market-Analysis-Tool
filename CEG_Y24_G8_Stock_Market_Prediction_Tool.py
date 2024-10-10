@@ -60,6 +60,8 @@ def main1():
     print(testDataHistList_Closing);
     print(testDataHistList_Date); #haha
     
+    #TODO: FIGURE OUT HOW TO USE GRAPHICS-LAYOUT
+
     #TODO: Add user input textbox to enter stock ticker symbols (AAPL, TSLA, etc), button to confirm, textboxes for period 
     #TODO: Ticker symbol validation using the csv.
     #TODO: Add events so that confirmation of valid ticker symbol adds another graph to the left column, or alternatively to the right coloumn
