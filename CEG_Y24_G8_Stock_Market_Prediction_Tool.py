@@ -41,6 +41,9 @@ def main():
     #print(utilAPI.textYFin("AAPL"));
     #print("Test:", utilAPI.testFunc())
 
+    #todo: sample 
+
+    utilAPI.testFunction()
 
     #Start GUI
     
