@@ -20,12 +20,9 @@ class MainPage(QWidget):
     def __init__(self):
         super().__init__()
 
-
         # page layout
         layout = QVBoxLayout()
-
         dropdown_layout = QHBoxLayout()
-
         ticker_period_label_layout = QHBoxLayout()
 
         # dropdown list to select ticker
@@ -97,7 +94,7 @@ class MainPage(QWidget):
         stock = yf.Ticker(selected_stock)
         history = stock.history(period = selected_period)
         
-        # plotting of graph
+        # creating and plotting of graph
         self.canvas.figure.clear()
         ax = self.canvas.figure.add_subplot(111)
         ax.plot(history.index, history['Close'], label = 'Close Price')
