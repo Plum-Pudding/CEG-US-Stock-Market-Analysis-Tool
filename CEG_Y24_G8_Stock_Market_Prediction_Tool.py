@@ -4,6 +4,7 @@ import os;
 import sys;
 import math
 from tkinter import Button;
+import webbrowser; 
 
 #vendor libraries
 
@@ -79,6 +80,7 @@ def main1():
 
     #Start event loop
     appMain.exec();
+
 
     print("sus");
     pass;
