@@ -60,6 +60,7 @@ class MainPage(QWidget):
         # Indicator Buttons
         button_layout = QHBoxLayout()
         self.sma_button = QPushButton('SMA')
+        self.sma_200_button = QPushButton('SMA (100d-200d)')
         self.rsi_button = QPushButton('RSI')
         self.bollinger_button = QPushButton('Bollinger Bands')
 
@@ -88,6 +89,7 @@ class MainPage(QWidget):
 
         # Indicator buttons to connect to their functions
         self.sma_button.clicked.connect(self.toggle_sma)
+        self.sma_200_button.clicked.connect(self.toggle_sma_200)
         self.rsi_button.clicked.connect(self.toggle_rsi)
         self.bollinger_button.clicked.connect(self.toggle_bollinger_bands)
 
@@ -96,6 +98,7 @@ class MainPage(QWidget):
 
         # flags for showing indicators
         self.show_sma = False
+        self.show_sma_200 = False
         self.show_rsi = False
         self.show_bollinger = False
 
@@ -107,6 +110,7 @@ class MainPage(QWidget):
 
         # Indicator buttons
         button_layout.addWidget(self.sma_button)
+        button_layout.addWidget(self.sma_200_button)
         button_layout.addWidget(self.rsi_button)
         button_layout.addWidget(self.bollinger_button)
 
@@ -167,6 +171,10 @@ class MainPage(QWidget):
 
     def toggle_sma(self):
         self.show_sma = not self.show_sma
+        self.plot_stock_data()
+
+    def toggle_sma_200(self):
+        self.show_sma_200 = not self.show_sma_200
         self.plot_stock_data()
     
     def toggle_rsi(self):
@@ -236,6 +244,15 @@ class MainPage(QWidget):
             ax.plot(data.index, data['SMA_10'], label='10-Day SMA', color='red')
             ax.plot(data.index, data['SMA_50'], label='50-Day SMA', color='green')
             ax.legend(loc='upper left')
+
+        # ADD SMA FOR 100 - 200 DAYS IF SELECTED
+        if self.show_sma_200:
+            # Calculate Simple Moving Averages (SMA)
+            data['SMA_100'] = data['Close'].rolling(window=100).mean()  # 100-day SMA
+            data['SMA_200'] = data['Close'].rolling(window=200).mean()  # 200-day SMA
+            ax.plot(data.index, data['SMA_100'], label='100-Day SMA', color='red')
+            ax.plot(data.index, data['SMA_200'], label='200-Day SMA', color='green')
+            ax.legend(loc='upper left')
         
         # ADD RSI (RELATIVE STRENGTH INDEX) IF SELECTED
         if self.show_rsi:
@@ -271,7 +288,7 @@ class MainPage(QWidget):
 
 
         if self.show_bollinger:
-            data['SMA'] = data['Close'].rolling(window=20).mean() # Simple Moving Average
+            data['SMA'] = data['Close'].rolling(window=20).mean() # Simple Moving Average (20 days)
             # 20 period standard deviation
             data['SD'] = data['Close'].rolling(window=20).std() # standard deviation
 
