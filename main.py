@@ -1,11 +1,12 @@
 import sys
 import PyQt6 as pyqt6
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QStackedWidget
+from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QStackedWidget, QScrollArea
 from PyQt6.QtGui import QIcon
 import pyqtgraph as pg
 
 import yfinance as yf # Yahoo! Finance API to get data on stocks
+import mplfinance as mpf
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # for matplotlib to work with PyQt6
 import matplotlib.pyplot as plt
@@ -23,6 +24,7 @@ import datetime as dt
 
 from main_ticker import MainPage
 from compare_ticker import ComparePage
+from rank_ticker import RankPage
 
 
 class myApp(QWidget):
@@ -33,7 +35,8 @@ class myApp(QWidget):
         # widgets settings
         self.setWindowTitle("Stocks Viewer")
         self.setWindowIcon(QIcon('icons/barcharticon.png'))
-        self.resize(1000,650) # width, height
+        self.resize(1500,850) # width, height
+        
 
         # Main Layout
         layout = QVBoxLayout()
@@ -42,18 +45,44 @@ class myApp(QWidget):
         button_layout = QHBoxLayout()
         self.main_button = QPushButton("View Single Stock")
         self.compare_button = QPushButton("Compare Stocks")
+        self.rank_button = QPushButton("Stock Rankings")
         button_layout.addWidget(self.main_button)
         button_layout.addWidget(self.compare_button)
+        button_layout.addWidget(self.rank_button)
+
+        self.main_button.setStyleSheet('''
+            QPushButton {
+                background-color: #997300;             
+                color: white;
+            }
+                                      
+        ''')
+        self.compare_button.setStyleSheet('''
+            QPushButton {
+                background-color: #191970;             
+                color: white;
+            }
+                                      
+        ''')
+        self.rank_button.setStyleSheet('''
+            QPushButton {
+                background-color: #B87333;             
+                color: white;
+            }
+                                      
+        ''')
 
         # Stacks of Pages
         self.stacked_widget = QStackedWidget()
 
-        # Add the 2 pages
+        # Add the other pages
         self.main_page = MainPage()
         self.compare_page = ComparePage()
+        self.rank_page = RankPage()
 
         self.stacked_widget.addWidget(self.main_page) # index 0
         self.stacked_widget.addWidget(self.compare_page) # index 1
+        self.stacked_widget.addWidget(self.rank_page) # index 2
 
         # add the menu and stacked widget to the main layout
         layout.addLayout(button_layout)
@@ -65,22 +94,23 @@ class myApp(QWidget):
         # connect buttons to switch pages
         self.main_button.clicked.connect(self.show_main_page)
         self.compare_button.clicked.connect(self.show_compare_page)
+        self.rank_button.clicked.connect(self.show_rank_page)
 
         
 
     def show_main_page(self):
-        """Switch to the main page"""
+        '''Switch to the main page'''
         self.stacked_widget.setCurrentIndex(0)
 
     def show_compare_page(self):
-        """Switch to the compare page"""
+        '''Switch to the compare page'''
         self.stacked_widget.setCurrentIndex(1)
         
-
+    def show_rank_page(self):
+        '''Switch to the stocks ranking page'''
+        self.stacked_widget.setCurrentIndex(2)
 
 if __name__ == "__main__":
-
-    #app = QApplication([])
     app = QApplication(sys.argv)
     app.setStyleSheet('''
         QWidget {
