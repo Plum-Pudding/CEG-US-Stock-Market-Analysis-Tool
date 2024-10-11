@@ -25,7 +25,32 @@ class RankPage(QWidget):
         # page layout
         layout = QVBoxLayout()
         horizontal_layout = QHBoxLayout()
+
         
-        # tickers = MainPage.get_stock_tickers()
+
+
+
+        
+        
+    
+
+    def get_stock_tickers(self):
+        # fetch tickers from data source dynamically. currently a predefined list
+        tickers = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA', 'AMD', 'INTC', 'META', 'JPM', 'V', 'JNJ', 'PG', 'KO', 'PFE', 'XOM', 'DIS', 'PEP', 'T', 'NFLX']
+        sorted_tickers = sorted(tickers)
+        return sorted(sorted_tickers)
+
+    def plot_bar_graph(self):
+        
+        for ticker in self.get_stock_tickers():
+            stock = yf.Ticker(ticker)
+            stock_info = stock.info
+            hist = stock.history(period = '10y')
+            pe_ratio = stock.info.get('forwardPE')
+
+            
+    
+
+
         
         

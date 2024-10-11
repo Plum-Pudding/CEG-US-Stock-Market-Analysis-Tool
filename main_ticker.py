@@ -157,6 +157,7 @@ class MainPage(QWidget):
         data['SMA_10'] = data['Close'].rolling(window=10).mean()  # 10-day SMA
         data['SMA_50'] = data['Close'].rolling(window=50).mean()  # 50-day SMA
 
+        # Calculate E
         data['EMA_10'] = data['Close'].ewm(span=10, adjust=False).mean()  # 10-day EMA
         
         # creating and plotting of graph
