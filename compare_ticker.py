@@ -63,6 +63,14 @@ class ComparePage(QWidget):
         # button to plot stock data
         self.plotButton = QPushButton('Plot Stock Data')
         self.plotButton.clicked.connect(self.plot_stock_data)
+        self.plotButton.setStyleSheet('''
+            QPushButton {
+                background-color: #4B0000;             
+                color: white;
+            }
+                                      
+        ''')
+
 
         self.canvas = FigureCanvas(plt.figure())
 

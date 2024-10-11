@@ -51,7 +51,7 @@ def main1():
     #Retrieve test stock data
     
     testDataHist = pandas.DataFrame();
-    testDataHist = utilAPI.yFinGetHist("TSLA","1d", "1d");
+    testDataHist = utilAPI.yFinGetHist("TSLA","max", "1d");
 
     testDataHistList_Closing = testDataHist["Close"].values.tolist();
     #testDataHistList_Date = testDataHist[testDataHist.columns[0]].values.tolist(); #dates column is empty on row 0, "Date" on row 1, data on row 2 onwards
@@ -150,13 +150,13 @@ def main1():
             layoutB.addWidget(graph5);
 
             layoutA.addLayout(layoutB);
-            layoutA.addWidget(graphLayoutA);
+            layoutA.addWidget(graph6);
             
             #layoutA.addWidget(graph6);
             #layoutA.addWidget(colourB);
 
             layoutC.addWidget(colourTest("red"));
-            layoutC.addWidget(colourTest("orange"));
+            layoutC.addWidget(colourTest("blue"));
 
             layoutD.addWidget(graphA);
 
