@@ -137,6 +137,9 @@ class ComparePage(QWidget):
         # Calculate Simple Moving Averages (SMA) for 1st graph
         data1['SMA_10'] = data1['Close'].rolling(window=10).mean()  # 10-day SMA
         data1['SMA_50'] = data1['Close'].rolling(window=50).mean()  # 50-day SMA
+        data1['SMA_100'] = data1['Close'].rolling(window=100).mean()  # 100-day SMA
+        data1['SMA_200'] = data1['Close'].rolling(window=200).mean()  # 200-day SMA
+        
 
         data1['EMA_10'] = data1['Close'].ewm(span=10, adjust=False).mean()  # 10-day EMA
 
@@ -150,6 +153,8 @@ class ComparePage(QWidget):
         # Calculate Simple Moving Averages (SMA) for 1st graph
         data2['SMA_10'] = data2['Close'].rolling(window=10).mean()  # 10-day SMA
         data2['SMA_50'] = data2['Close'].rolling(window=50).mean()  # 50-day SMA
+        data2['SMA_100'] = data2['Close'].rolling(window=100).mean()  # 100-day SMA
+        data2['SMA_200'] = data2['Close'].rolling(window=200).mean()  # 200-day SMA
 
         # making the period label neater to show full period
         for key, value  in self.adjust_period('all').items(): # to get the graph label to show the period properly
@@ -170,6 +175,8 @@ class ComparePage(QWidget):
         ax1.plot(stock1.index, stock1['Close'], label =f'{selected_ticker1} Close Price')
         ax1.plot(data1.index, data1['SMA_10'], label='10-Day SMA', color='red')
         ax1.plot(data1.index, data1['SMA_50'], label='50-Day SMA', color='green')
+        ax1.plot(data1.index, data1['SMA_100'], label='100-Day SMA', color='orange')
+        ax1.plot(data1.index, data1['SMA_200'], label='200-Day SMA', color='purple')
         # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
         ax1.set_title(f'{stock_info1.get('longName')} Stock Price in {period_full}')
         ax1.set_xlabel('Date')
@@ -180,6 +187,8 @@ class ComparePage(QWidget):
         ax2.plot(stock2.index, stock2['Close'], label = f'{selected_ticker2} Close Price')
         ax2.plot(data2.index, data2['SMA_10'], label='10-Day SMA', color='red')
         ax2.plot(data2.index, data2['SMA_50'], label='50-Day SMA', color='green')
+        ax2.plot(data2.index, data2['SMA_100'], label='100-Day SMA', color='orange')
+        ax2.plot(data2.index, data2['SMA_200'], label='200-Day SMA', color='purple')
         # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
         ax2.set_title(f'{stock_info2.get('longName')} Stock Price in {period_full}')
         ax2.set_xlabel('Date')
