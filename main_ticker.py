@@ -204,7 +204,6 @@ class MainPage(QWidget):
         self.canvas.figure.clear() # clear any existing graph in case
         # ax = self.canvas.figure.add_subplot(111)
 
-
         # check whether RSi is showing as RSI is indicated below the main graph, thus expanding the canvas is needed
         if self.show_rsi:
             ax, ax2 = self.canvas.figure.subplots(2, sharex=True, gridspec_kw={'height_ratios': [3,1]})
@@ -228,7 +227,6 @@ class MainPage(QWidget):
             # Plot candlestick
             mpf.plot(history, type='candle', ax=ax, style='yahoo')
             ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full}')
-            ax.legend(loc = 'upper left')
             
         # ADD SMA (SIMPLE MOVING AVERAGE) IF SELECTED
         if self.show_sma:
@@ -237,8 +235,9 @@ class MainPage(QWidget):
             data['SMA_50'] = data['Close'].rolling(window=50).mean()  # 50-day SMA
             ax.plot(data.index, data['SMA_10'], label='10-Day SMA', color='red')
             ax.plot(data.index, data['SMA_50'], label='50-Day SMA', color='green')
-            ax.legend(loc = 'upper left')
-
+            ax.legend(loc='upper left')
+        
+        # ADD RSI (RELATIVE STRENGTH INDEX) IF SELECTED
         if self.show_rsi:
             # Calculate Relative Strength Index (RSI)
             delta = history['Close'].diff(1)
@@ -272,7 +271,22 @@ class MainPage(QWidget):
 
 
         if self.show_bollinger:
-            pass
+            data['SMA'] = data['Close'].rolling(window=20).mean() # Simple Moving Average
+            # 20 period standard deviation
+            data['SD'] = data['Close'].rolling(window=20).std() # standard deviation
+
+            data['UB'] = data['SMA'] + (2 * data['SD']) # upper band = simple moving average + (2 * standard deviation)
+            data['LB'] = data['SMA'] - (2 * data['SD']) # lower band = simple moving average - (2 * standard deviation)
+            data = data.dropna()
+
+            ax.plot(data.index, data['UB'], label='Upper Bollinger Band', color='red')
+            ax.plot(data.index, data['LB'], label='Lower Bollinger Band', color='green')
+            ax.fill_between(data.index, data['UB'], data['LB'], color='lightgray')
+            ax.plot(data.index, data['SMA'], label='Middle Bollinger Band', color='orange')
+
+            ax.legend(loc='upper left')
+
+
         self.canvas.draw()
 
         # display buy evaluation
