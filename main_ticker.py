@@ -60,7 +60,21 @@ class MainPage(QWidget):
         # Indicator Buttons
         button_layout = QHBoxLayout()
         self.sma_button = QPushButton('SMA')
-        self.sma_200_button = QPushButton('SMA (100d-200d)')
+        self.sma_button.setStyleSheet('''
+            QPushButton {
+                background-color: #086900;             
+                color: white;
+            }
+                                      
+        ''')
+        self.sma_200_button = QPushButton('SMA (100 days and 200 days)')
+        self.sma_200_button.setStyleSheet('''
+            QPushButton {
+                background-color: #330066;             
+                color: white;
+            }
+                                      
+        ''')
         self.rsi_button = QPushButton('RSI')
         self.bollinger_button = QPushButton('Bollinger Bands')
 
