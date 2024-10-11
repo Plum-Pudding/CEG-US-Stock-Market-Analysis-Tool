@@ -35,6 +35,7 @@ class myApp(QWidget):
         self.setWindowTitle("Stocks Viewer")
         self.setWindowIcon(QIcon('icons/barcharticon.png'))
         self.resize(1500,850) # width, height
+        
 
         # Main Layout
         layout = QVBoxLayout()
@@ -47,6 +48,28 @@ class myApp(QWidget):
         button_layout.addWidget(self.main_button)
         button_layout.addWidget(self.compare_button)
         button_layout.addWidget(self.rank_button)
+
+        self.main_button.setStyleSheet('''
+            QPushButton {
+                background-color: #997300;             
+                color: white;
+            }
+                                      
+        ''')
+        self.compare_button.setStyleSheet('''
+            QPushButton {
+                background-color: #191970;             
+                color: white;
+            }
+                                      
+        ''')
+        self.rank_button.setStyleSheet('''
+            QPushButton {
+                background-color: #B87333;             
+                color: white;
+            }
+                                      
+        ''')
 
         # Stacks of Pages
         self.stacked_widget = QStackedWidget()

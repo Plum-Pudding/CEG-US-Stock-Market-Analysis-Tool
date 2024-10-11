@@ -56,9 +56,9 @@ class ComparePage(QWidget):
         self.period_combo.addItems(period)
 
         # just a label
-        self.label1 = QLabel('Select a stock to view data')
-        self.label2 = QLabel('Select a stock to view data')
-        self.period_label = QLabel('Select period')
+        self.label1 = QLabel('SELECT A STOCK TO VIEW DATA')
+        self.label2 = QLabel('SELECT A STOCK TO VIEW DATA')
+        self.period_label = QLabel('SELECT PERIOD')
 
         # button to plot stock data
         self.plotButton = QPushButton('Plot Stock Data')

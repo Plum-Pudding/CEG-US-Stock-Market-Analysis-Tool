@@ -39,8 +39,8 @@ class MainPage(QWidget):
         self.period_combo.addItems(period)
 
         # just a label
-        self.label = QLabel('Select a stock to view data')
-        self.period_label = QLabel('Select period')
+        self.label = QLabel('SELECT A STOCK TO VIEW DATA')
+        self.period_label = QLabel('SELECT PERIOD')
 
         # evaluation label config
         self.eval_label = QLabel()
