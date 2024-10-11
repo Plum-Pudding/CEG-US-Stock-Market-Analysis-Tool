@@ -6,6 +6,7 @@ from PyQt6.QtGui import QIcon
 import pyqtgraph as pg
 
 import yfinance as yf # Yahoo! Finance API to get data on stocks
+import mplfinance as mpf
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # for matplotlib to work with PyQt6
 import matplotlib.pyplot as plt

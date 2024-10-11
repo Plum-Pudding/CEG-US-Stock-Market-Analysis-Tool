@@ -6,6 +6,7 @@ from PyQt6.QtGui import QIcon
 import pyqtgraph as pg
 
 import yfinance as yf # Yahoo! Finance API to get data on stocks
+import mplfinance as mpf # for candlesticks graph purposes
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # for matplotlib to work with PyQt6
 import matplotlib.pyplot as plt
@@ -26,7 +27,6 @@ class MainPage(QWidget):
         ticker_period_label_layout = QHBoxLayout()
         evaluation_layout = QVBoxLayout()
         summary_layout = QVBoxLayout()
-        hist_layout = QVBoxLayout()
 
         # dropdown list to select ticker
         self.ticker_combo = QComboBox()
@@ -37,6 +37,10 @@ class MainPage(QWidget):
         self.period_combo = QComboBox()
         period = self.adjust_period('keys')
         self.period_combo.addItems(period)
+
+        # dropdown menu for graph type
+        self.graph_type_combo = QComboBox()
+        self.graph_type_combo.addItems(['Line Graph', 'Candlestick'])
 
         # just a label
         self.label = QLabel('SELECT A STOCK TO VIEW DATA')
@@ -52,6 +56,12 @@ class MainPage(QWidget):
             font-family: verdana;
             font-weight: bold;                  
         ''')
+
+        # Indicator Buttons
+        button_layout = QHBoxLayout()
+        self.sma_button = QPushButton('SMA')
+        self.rsi_button = QPushButton('RSI')
+        self.bollinger_button = QPushButton('Bollinger Bands')
 
         # summary label config
         self.summary_label = QLabel()
@@ -76,13 +86,31 @@ class MainPage(QWidget):
         # set layout to main window
         self.setLayout(layout)
 
+        # Indicator buttons to connect to their functions
+        self.sma_button.clicked.connect(self.toggle_sma)
+        self.rsi_button.clicked.connect(self.toggle_rsi)
+        self.bollinger_button.clicked.connect(self.toggle_bollinger_bands)
+
         # click button to connect to get stock data
         self.plotButton.clicked.connect(self.plot_stock_data)
 
+        # flags for showing indicators
+        self.show_sma = False
+        self.show_rsi = False
+        self.show_bollinger = False
 
         ''' layout section to add widgets. (add widgets to QVBoxLayout and make them appear) '''
         # graph layout
         layout.addWidget(self.canvas)
+
+        layout.addWidget(self.graph_type_combo)
+
+        # Indicator buttons
+        button_layout.addWidget(self.sma_button)
+        button_layout.addWidget(self.rsi_button)
+        button_layout.addWidget(self.bollinger_button)
+
+        layout.addLayout(button_layout)
 
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
@@ -134,9 +162,27 @@ class MainPage(QWidget):
             return list(period_dict.values())
         elif selection == 'all':
             return period_dict
+        
+    ''' ============ INDICATORS FUNCTIONS ============'''
+
+    def toggle_sma(self):
+        self.show_sma = not self.show_sma
+        self.plot_stock_data()
+    
+    def toggle_rsi(self):
+        self.show_rsi = not self.show_rsi
+        self.plot_stock_data()
+
+    def toggle_bollinger_bands(self):
+        self.show_bollinger = not self.show_bollinger
+        self.plot_stock_data()
+
+
+    ''' ============ GRAPH PLOTTING CODES ============'''
 
     def plot_stock_data(self):
 
+        # GET SELECTED STOCKS AND PERIOD
         selected_stock = self.ticker_combo.currentText() # pulls the stock selected in the dropdown list
         stock = yf.Ticker(selected_stock)
         stock_info = stock.info
@@ -147,30 +193,87 @@ class MainPage(QWidget):
                 period_full = value
         self.period_label.setText(f'Period: {period_full}')
 
-
         # historical data for selected stock. 1mo = 30/31 days, 1y = 1 year, max: from the beginning
-        stock = yf.Ticker(selected_stock)
         history = stock.history(period = selected_period)
         data = stock.history(period = selected_period) # for SMA
 
-        # Calculate Simple Moving Averages (SMA)
-        data['SMA_10'] = data['Close'].rolling(window=10).mean()  # 10-day SMA
-        data['SMA_50'] = data['Close'].rolling(window=50).mean()  # 50-day SMA
-
-        # Calculate E
+        # Calculate EMA
         data['EMA_10'] = data['Close'].ewm(span=10, adjust=False).mean()  # 10-day EMA
         
         # creating and plotting of graph
         self.canvas.figure.clear() # clear any existing graph in case
         ax = self.canvas.figure.add_subplot(111)
-        ax.plot(history.index, history['Close'], label = 'Close Price', color='blue')
-        ax.plot(data.index, data['SMA_10'], label='10-Day SMA', color='red')
-        ax.plot(data.index, data['SMA_50'], label='50-Day SMA', color='green')
-        # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
-        ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full} with 10-Day and 50-Day Simple Moving Averages')
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Close Price')
-        ax.legend()
+
+
+        # check whether RSi is showing as RSI is indicated below the main graph, thus expanding the canvas is needed
+        if self.show_rsi:
+            ax, ax2 = self.canvas.figure.subplots(2, sharex=True, gridspec_kw={'height_ratios': [3,1]})
+        else:
+            ax = self.canvas.figure.add_subplot(111)
+
+
+        # Determine type of graph selected
+        selected_graph_type = self.graph_type_combo.currentText()
+
+        if selected_graph_type == 'Line Graph':
+            # Plot Line Graph
+            ax.plot(history.index, history['Close'], label = 'Close Price', color='blue')
+            # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
+            ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full}')
+            # ax.set_xlabel('Date')
+            # ax.set_ylabel('Close Price')
+
+        elif selected_graph_type == 'Candlestick':
+            # Plot candlestick
+            mpf.plot(history, type='candle', ax=self.canvas.figure.add_subplot(111), style='yahoo')
+            ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full}')
+        
+
+        # ADD SMA (SIMPLE MOVING AVERAGE) IF SELECTED
+        if self.show_sma:
+            # Calculate Simple Moving Averages (SMA)
+            data['SMA_10'] = data['Close'].rolling(window=10).mean()  # 10-day SMA
+            data['SMA_50'] = data['Close'].rolling(window=50).mean()  # 50-day SMA
+            ax.plot(data.index, data['SMA_10'], label='10-Day SMA', color='red')
+            ax.plot(data.index, data['SMA_50'], label='50-Day SMA', color='green')
+
+        if self.show_rsi:
+            # Calculate Relative Strength Index (RSI)
+            delta = history['Close'].diff(1)
+            delta.dropna(inplace=True) # drop the "not a number" values
+
+            postive = delta.copy()
+            negative = delta.copy()
+
+            postive[postive < 0] = 0
+            negative[negative > 0] = 0
+
+            # RSI is calculated over a 14-day period
+            days = 14
+
+            # Relative Strength Calculation
+            avg_gain = postive.rolling(window=days).mean()
+            avg_loss = abs(negative.rolling(window=days).mean()) # absolute value as we need a positive value when knowing the absolute difference
+
+            relative_strength = avg_gain / avg_loss
+            rsi = 100 - (100 / (1 + relative_strength))
+            rsi = rsi.dropna()
+            history_rsi = history.loc[rsi.index]
+
+            # ax2 = ax.twinx()
+            ax2.plot(history_rsi.index, rsi, label='RSI', color='orange')
+            ax2.axhline(70, color='red', linestyle='--') # "financial experts" claimed that between 70 and 30 is important. 30 oversold, 70 overbought.
+            ax2.axhline(30, color='green', linestyle='--')
+            ax2.set_ylim(0,100)
+            ax2.set_ylabel('RSI')
+
+
+        if self.show_bollinger:
+            pass
+
+
+
+        ax.legend(loc = 'upper left')
         self.canvas.draw()
 
         # display buy evaluation
