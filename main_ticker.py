@@ -202,7 +202,7 @@ class MainPage(QWidget):
         
         # creating and plotting of graph
         self.canvas.figure.clear() # clear any existing graph in case
-        ax = self.canvas.figure.add_subplot(111)
+        # ax = self.canvas.figure.add_subplot(111)
 
 
         # check whether RSi is showing as RSI is indicated below the main graph, thus expanding the canvas is needed
@@ -220,15 +220,16 @@ class MainPage(QWidget):
             ax.plot(history.index, history['Close'], label = 'Close Price', color='blue')
             # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
             ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full}')
-            # ax.set_xlabel('Date')
-            # ax.set_ylabel('Close Price')
+            ax.set_xlabel('Date')
+            ax.set_ylabel('Close Price')
+            ax.legend(loc = 'upper left')
 
         elif selected_graph_type == 'Candlestick':
             # Plot candlestick
-            mpf.plot(history, type='candle', ax=self.canvas.figure.add_subplot(111), style='yahoo')
+            mpf.plot(history, type='candle', ax=ax, style='yahoo')
             ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full}')
-        
-
+            ax.legend(loc = 'upper left')
+            
         # ADD SMA (SIMPLE MOVING AVERAGE) IF SELECTED
         if self.show_sma:
             # Calculate Simple Moving Averages (SMA)
@@ -236,6 +237,7 @@ class MainPage(QWidget):
             data['SMA_50'] = data['Close'].rolling(window=50).mean()  # 50-day SMA
             ax.plot(data.index, data['SMA_10'], label='10-Day SMA', color='red')
             ax.plot(data.index, data['SMA_50'], label='50-Day SMA', color='green')
+            ax.legend(loc = 'upper left')
 
         if self.show_rsi:
             # Calculate Relative Strength Index (RSI)
@@ -266,14 +268,11 @@ class MainPage(QWidget):
             ax2.axhline(30, color='green', linestyle='--')
             ax2.set_ylim(0,100)
             ax2.set_ylabel('RSI')
+            ax2.legend()
 
 
         if self.show_bollinger:
             pass
-
-
-
-        ax.legend(loc = 'upper left')
         self.canvas.draw()
 
         # display buy evaluation
