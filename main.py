@@ -51,7 +51,7 @@ class myApp(QWidget):
         # Stacks of Pages
         self.stacked_widget = QStackedWidget()
 
-        # Add the 2 pages
+        # Add the other pages
         self.main_page = MainPage()
         self.compare_page = ComparePage()
         self.rank_page = RankPage()
@@ -70,6 +70,7 @@ class myApp(QWidget):
         # connect buttons to switch pages
         self.main_button.clicked.connect(self.show_main_page)
         self.compare_button.clicked.connect(self.show_compare_page)
+        self.rank_button.clicked.connect(self.show_rank_page)
 
         
 
