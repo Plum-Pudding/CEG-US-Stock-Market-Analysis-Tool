@@ -250,8 +250,8 @@ class MainPage(QWidget):
             # Calculate Simple Moving Averages (SMA)
             data['SMA_100'] = data['Close'].rolling(window=100).mean()  # 100-day SMA
             data['SMA_200'] = data['Close'].rolling(window=200).mean()  # 200-day SMA
-            ax.plot(data.index, data['SMA_100'], label='100-Day SMA', color='red')
-            ax.plot(data.index, data['SMA_200'], label='200-Day SMA', color='green')
+            ax.plot(data.index, data['SMA_100'], label='100-Day SMA', color='orange')
+            ax.plot(data.index, data['SMA_200'], label='200-Day SMA', color='purple')
             ax.legend(loc='upper left')
         
         # ADD RSI (RELATIVE STRENGTH INDEX) IF SELECTED
