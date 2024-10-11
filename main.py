@@ -86,8 +86,6 @@ class myApp(QWidget):
         self.stacked_widget.setCurrentIndex(2)
 
 if __name__ == "__main__":
-
-    #app = QApplication([])
     app = QApplication(sys.argv)
     app.setStyleSheet('''
         QWidget {
