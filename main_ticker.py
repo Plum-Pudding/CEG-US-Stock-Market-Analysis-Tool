@@ -151,7 +151,7 @@ class MainPage(QWidget):
         # historical data for selected stock. 1mo = 30/31 days, 1y = 1 year, max: from the beginning
         stock = yf.Ticker(selected_stock)
         history = stock.history(period = selected_period)
-        data = stock.history(period = selected_period)
+        data = stock.history(period = selected_period) # for SMA
 
         # Calculate Simple Moving Averages (SMA)
         data['SMA_10'] = data['Close'].rolling(window=10).mean()  # 10-day SMA
@@ -160,7 +160,7 @@ class MainPage(QWidget):
         data['EMA_10'] = data['Close'].ewm(span=10, adjust=False).mean()  # 10-day EMA
         
         # creating and plotting of graph
-        self.canvas.figure.clear()
+        self.canvas.figure.clear() # clear any existing graph in case
         ax = self.canvas.figure.add_subplot(111)
         ax.plot(history.index, history['Close'], label = 'Close Price', color='blue')
         ax.plot(data.index, data['SMA_10'], label='10-Day SMA', color='red')
