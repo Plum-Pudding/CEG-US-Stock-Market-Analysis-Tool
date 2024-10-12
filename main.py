@@ -1,12 +1,12 @@
 import sys
 import PyQt6 as pyqt6
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QStackedWidget, QScrollArea, QTabWidget
+from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QStackedWidget, QScrollArea
 from PyQt6.QtGui import QIcon
 import pyqtgraph as pg
 
 import yfinance as yf # Yahoo! Finance API to get data on stocks
-import mplfinance as mpf 
+import mplfinance as mpf
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # for matplotlib to work with PyQt6
 import matplotlib.pyplot as plt
@@ -25,10 +25,9 @@ import datetime as dt
 from main_ticker import MainPage
 from compare_ticker import ComparePage
 from rank_ticker import RankPage
-from ml_prediction import PredictionPage
 
 
-class myApp(QMainWindow):
+class myApp(QWidget):
 
     def __init__(self):
         super().__init__()
@@ -38,68 +37,80 @@ class myApp(QMainWindow):
         self.setWindowIcon(QIcon('icons/barcharticon.png'))
         self.resize(1500,850) # width, height
         
-        #Tabs widget
-        mainTabs = QTabWidget(); #Create base tab widget
-        mainTabs.setTabPosition(QTabWidget.TabPosition.West); #Put the tabs on the left(west) side
-        mainTabs.setMovable(True); #Allow user to drag and drop tabs
 
         # Main Layout
         layout = QVBoxLayout()
 
-        #Individual tab layouts
-        mainPage1 = MainPage(); #create instances of each page class
-        comparePage1 = ComparePage();
-        rankPage1 = RankPage();
-        predictionPage1 = PredictionPage();
+        # Top Navigation Buttons
+        button_layout = QHBoxLayout()
+        self.main_button = QPushButton("View Single Stock")
+        self.compare_button = QPushButton("Compare Stocks")
+        self.rank_button = QPushButton("Stock Rankings")
+        button_layout.addWidget(self.main_button)
+        button_layout.addWidget(self.compare_button)
+        button_layout.addWidget(self.rank_button)
 
-        layoutTab1 = QVBoxLayout();
-        layoutTab2 = QVBoxLayout();
-        layoutTab3 = QVBoxLayout();
-        layoutTab4 = QVBoxLayout();
-        layoutTab1.addWidget(mainPage1); #Put the page widgets in layouts
-        layoutTab2.addWidget(comparePage1);
-        layoutTab3.addWidget(rankPage1);
-        layoutTab4.addWidget(predictionPage1);
-
-        #Individual tab widgets
-        tabMain = QWidget(); #Creating tab widgets
-        tabCompare = QWidget();
-        tabRank = QWidget();
-        tabPredict = QWidget();
-        tabMain.setLayout(layoutTab1); #Setting tabs to layout with page widgets
-        tabCompare.setLayout(layoutTab2);
-        tabRank.setLayout(layoutTab3);
-        tabPredict.setLayout(layoutTab4);
-
-        #Tab order
-        mainTabs.addTab(tabMain, "MAIN"); #set tab1 widget as first tab, tab2 as second tab for mainTabs widget
-        mainTabs.addTab(tabCompare, "COMPARE");
-        mainTabs.addTab(tabRank, "RANKING");
-        mainTabs.addTab(tabPredict, "PREDICTION");
-
-        #Set mainTabs tab widget to the main one
-        self.setCentralWidget(mainTabs);
-
-        mainTabs.setStyleSheet("""
-            QTabBar::tab {
-                background: lightgray;
-                padding: 15px;
+        self.main_button.setStyleSheet('''
+            QPushButton {
+                background-color: #997300;             
+                color: white;
             }
-            QTabBar::tab:selected {
-                background: #36454F;  /* Color of selected tab */
+                                      
+        ''')
+        self.compare_button.setStyleSheet('''
+            QPushButton {
+                background-color: #191970;             
+                color: white;
             }
-            QTabBar::tab:!selected {
-                background: #191970;  /* Color of unselected tab */
+                                      
+        ''')
+        self.rank_button.setStyleSheet('''
+            QPushButton {
+                background-color: #B87333;             
+                color: white;
             }
-            QTabBar::tab:hover {
-                background: #36454F;  /* Color when mouse hovers over the tab */
-            }
-        """)
+                                      
+        ''')
 
-def main():
-    
-    
+        # Stacks of Pages
+        self.stacked_widget = QStackedWidget()
 
+        # Add the other pages
+        self.main_page = MainPage()
+        self.compare_page = ComparePage()
+        self.rank_page = RankPage()
+
+        self.stacked_widget.addWidget(self.main_page) # index 0
+        self.stacked_widget.addWidget(self.compare_page) # index 1
+        self.stacked_widget.addWidget(self.rank_page) # index 2
+
+        # add the menu and stacked widget to the main layout
+        layout.addLayout(button_layout)
+        layout.addWidget(self.stacked_widget)
+
+        # set layout to main window
+        self.setLayout(layout)
+
+        # connect buttons to switch pages
+        self.main_button.clicked.connect(self.show_main_page)
+        self.compare_button.clicked.connect(self.show_compare_page)
+        self.rank_button.clicked.connect(self.show_rank_page)
+
+        
+
+    def show_main_page(self):
+        '''Switch to the main page'''
+        self.stacked_widget.setCurrentIndex(0)
+
+    def show_compare_page(self):
+        '''Switch to the compare page'''
+        self.stacked_widget.setCurrentIndex(1)
+        
+    def show_rank_page(self):
+        '''Switch to the stocks ranking page'''
+        self.stacked_widget.setCurrentIndex(2)
+
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyleSheet('''
         QWidget {
@@ -114,12 +125,6 @@ def main():
             color: white
         }
     ''')
-
     window = myApp()
     window.show()  # to display the window
     sys.exit(app.exec())  # to exit
-
-    pass;
-
-if __name__ == "__main__":
-    main();
