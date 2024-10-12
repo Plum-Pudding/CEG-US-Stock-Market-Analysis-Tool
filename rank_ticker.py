@@ -35,7 +35,7 @@ class RankPage(QWidget):
 
     def isValidTickerSymbol(givenSymbol): #Check is given string is in stockTickerSymbols.csv i.e. is a real stock
 
-        if 
+        
 
         return (True);
 
