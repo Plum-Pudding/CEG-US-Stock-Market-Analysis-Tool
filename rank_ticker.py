@@ -1,3 +1,4 @@
+from cProfile import label
 import sys
 import PyQt6 as pyqt6
 from PyQt6.QtCore import QLine, Qt
@@ -24,7 +25,7 @@ class RankPage(QWidget):
 
         # page layout
         layoutBase = QVBoxLayout()
-        layoutUI = QHBoxLayout()
+        layoutUIBar = QHBoxLayout()
         layoutStocksDisplay = QHBoxLayout() 
         
         layoutA1 = QVBoxLayout() 
@@ -38,16 +39,28 @@ class RankPage(QWidget):
         lineEditTickerSymbol = QLineEdit()
         lineEditTickerSymbol.setMaxLength(6)
         lineEditTickerSymbol.setPlaceholderText("AAPL, MSFT, GOOGL, etc.")
+        
 
-        buttonAddStockConfirm = QPushButton()
+        buttonAddStockConfirm = QPushButton("Sample")
         buttonClearList = QPushButton()
 
-        #layoutUI.addWidget()
+        layoutUIBar.addWidget(labelAddStock)
+        layoutUIBar.addWidget(lineEditTickerSymbol)
+        layoutUIBar.addWidget(buttonAddStockConfirm)
+
+        # Stock listing layout
+
+        layoutBase.addLayout(layoutUIBar)
+
+
+        self.setLayout(layoutBase)
 
         # just using the existing stocks-- retrieve 5d performance
 
         
+    def buttonAddStock():
 
+        pass;
 
     def get_stock_tickers(self):
         # fetch tickers from data source dynamically. currently a predefined list
