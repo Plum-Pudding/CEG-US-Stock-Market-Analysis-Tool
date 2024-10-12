@@ -1,3 +1,21 @@
+"""
+
+
+
+
+
+**************************
+
+DEPRECATED
+
+**************************
+
+
+
+
+
+"""
+
 #system-- check if we still need some of these, pretty sure we don't
 from ast import main
 from ipaddress import ip_interface

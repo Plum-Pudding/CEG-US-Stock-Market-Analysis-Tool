@@ -33,6 +33,12 @@ class RankPage(QWidget):
         sorted_tickers = sorted(tickers)
         return sorted(sorted_tickers)
 
+    def isValidTickerSymbol(givenSymbol): #Check is given string is in stockTickerSymbols.csv i.e. is a real stock
+
+        if 
+
+        return (True);
+
     def plot_bar_graph(self):
         
         for ticker in self.get_stock_tickers():
