@@ -14,11 +14,11 @@ import os
 
 def load_data(ticker):
 
-    df = pd.read_csv(f'{ticker}_10y_history.csv', index_col='Date', parse_dates=True)
+    df = pd.read_csv(f'{ticker}_10y_history.csv', index_col='Date', parse_dates=True) # reads the csv files according to the tickers
 
-    df.index = pd.to_datetime(df.index, utc=True).tz_localize(None)
+    df.index = pd.to_datetime(df.index, utc=True).tz_localize(None) # convert date to date format
 
-    df['SMA'] = df['Close'].rolling(window=50).mean()
+    df['SMA'] = df['Close'].rolling(window=50).mean() # simple moving average in period of 50 days
 
     # scaling data for LSTM (Long short-term memory)
     scaler = MinMaxScaler(feature_range=(0,1))
