@@ -26,6 +26,11 @@ class RankPage(QWidget):
         layout = QVBoxLayout()
         horizontal_layout = QHBoxLayout()
 
+        #pre-load ticker csv to a list
+        with open("stockTickerSymbols.csv") as i1:
+            tickerSymbolsList = [row.split()[0] for row in i1];
+        #print(tickerSymbolsList);
+
 
     def get_stock_tickers(self):
         # fetch tickers from data source dynamically. currently a predefined list

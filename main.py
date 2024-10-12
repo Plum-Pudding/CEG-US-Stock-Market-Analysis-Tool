@@ -82,10 +82,7 @@ class myApp(QMainWindow):
 
 def main():
     
-    #pre-load ticker csv to a list
-    with open("stockTickerSymbols.csv") as i1:
-        tickerSymbolsList = [row.split()[0] for row in i1];
-    #print(tickerSymbolsList);
+    
 
     app = QApplication(sys.argv)
     app.setStyleSheet('''
