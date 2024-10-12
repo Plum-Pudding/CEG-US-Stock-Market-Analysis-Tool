@@ -4,21 +4,23 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas 
 from matplotlib.figure import Figure
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import os
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
 import tensorflow
-from keras.api.models import Sequential
+from keras.api.models import Sequential, load_model, Model
 from keras.api.layers import Dense, Dropout, LSTM
 
-from train_page import train_model_with_filtered_data # import training logic
+from training_page import train_model, load_data # import training logic
 
-class PredictionPage(QWidget):
+class PredictPage(QWidget):
     def __init__(self):
         super().__init__()
-            
+        
         # page layout
         layout = QVBoxLayout()
         dropdown_layout = QHBoxLayout()
@@ -71,15 +73,17 @@ class PredictionPage(QWidget):
 
 
 
+    
     def get_stock_tickers(self):
         # fetch tickers from data source dynamically. currently a predefined list
         tickers = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA', 'AMD', 'INTC', 'META', 'JPM', 'V', 'JNJ', 'PG', 'KO', 'PFE', 'XOM', 'DIS', 'PEP', 'T', 'NFLX']
         sorted_tickers = sorted(tickers)
         return sorted(sorted_tickers)
     
-    def adjust_period(self, selection): # to showcase the period properly in full form
-        # get the time period of stock performance over the days/months/years
+
+    def adjust_period(self, selection):
         period_dict = {'1y': '1 year', '2y' : '2 years', '5y' : '5 years', '10y' : '10 years'}
+
 
         if selection == 'keys':
             return list(period_dict.keys())
@@ -87,10 +91,14 @@ class PredictionPage(QWidget):
             return list(period_dict.values())
         elif selection == 'all':
             return period_dict
-    
+        
+
     def plot_stock_data(self):
         selected_ticker = self.ticker_combo.currentText()
         selected_period = self.period_combo.currentText()
+
+        #  load historical data and the trained model
+        df = pd.read_csv(f'{selected_ticker}_10y_history.csv')
 
         # determine start and end year based on selected period
         current_year = pd.Timestamp.now().year
@@ -103,43 +111,49 @@ class PredictionPage(QWidget):
         else:
             start_year, end_year = current_year - 10, current_year
 
-        # Train model and get predictions (using train_page.py logic)
-        model, X_test, y_test, predictions = train_model_with_filtered_data(selected_ticker, start_year, end_year)
 
-        # plot the actual vs predicted graphs side by side
-        self.plot_side_by_side(selected_ticker, X_test.index, y_test, predictions)
-    
-    def plot_side_by_side(self, ticker, dates, actual_prices, predicted_prices):
+        # convert the index to datetimeindex and remove timezone info if present
+        df['Date'] = pd.to_datetime(df['Date'], utc=True)
 
-        dates = pd.to_datetime(dates)
+        
+        filtered_data = df[(df['Date'] >= f'{start_year}-01-01') & (df['Date'] <= f'{end_year}-12-31')]
 
-        # Clear existing graphs (in case)
+
+        train_model(selected_ticker)
+
+        # Load model and make predictions
+        model = load_model(f'{selected_ticker}_model.keras')
+
+
+        scaler = MinMaxScaler(feature_range=(0,1))
+        scaled_data = scaler.fit_transform(filtered_data['Close'].values.reshape(-1,1))
+
+
+        # Testing the model
+        X_test = []
+        for i in range(60, len(scaled_data)):
+            X_test.append(scaled_data[i-60:i, 0])
+
+        X_test = np.array(X_test)
+        X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))  # reshape for LSTM
+
+
+
+        predictions = model.predict(X_test)
+        predictions = scaler.inverse_transform(predictions) # rescale predictions
+
+        # Plot actual vs predicted prices
         self.canvas.figure.clear()
 
-        fig = Figure(figsize=(13, 7))
-        self.canvas.figure = fig
-        # Create subplots for side-by-side comparison
-        ax1, ax2 = fig.subplots(1, 2)
+        ax = self.canvas.figure.add_subplot(111)
 
-        # fig, (ax1, ax2) = plt.subplots(1,2, figsize=(13,7), sharey=True)
-
-        # plot actual prices on the left
-        ax1.plot(dates, actual_prices, label='Actual Price', color='blue')
-        ax1.set_title(f'{ticker} - Actual Prices')
-        ax1.set_xlabel('Date')
-        ax1.set_ylabel('Price')
-        ax1.legend()
-
-        # plot predicted prices on the right
-        ax2.plot(dates, predicted_prices, label='Predicted Price', color='red')
-        ax2.set_title(f'{ticker} - Predicted Prices')
-        ax2.set_xlabel('Date')
-        ax2.set_ylabel('Price')
-        ax2.legend()
+        ax.plot(filtered_data['Date'], filtered_data['Close'], label='Actual Price', color='black')
+        ax.plot(filtered_data['Date'][60:], predictions, label = 'Predicted Price', color='green')
+        ax.set_title(f'{selected_ticker} Share Price')
+        ax.set_xlabel('Date')
+        ax.set_ylabel(f'{selected_ticker} Price')
+        ax.legend()
 
         self.canvas.draw()
-
-    
-
 
 

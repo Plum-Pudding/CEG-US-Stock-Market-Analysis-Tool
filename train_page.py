@@ -1,7 +1,12 @@
 import pandas as pd
+
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import MinMaxScaler
+import tensorflow
+from keras.api.models import Sequential
+from keras.api.layers import Dense, Dropout, LSTM
 
 
 def load_and_filter_data(ticker, start_year, end_year):
@@ -15,11 +20,11 @@ def load_and_filter_data(ticker, start_year, end_year):
     filtered_data = data[(data.index.year >= start_year) & (data.index.year <= end_year)]
 
     # Indicator features (Simple Moving Average, Volatility)
-    filtered_data.loc[:, 'SMA_10'] = filtered_data['Close'].rolling(window=10).mean() # add 10 day sma
-    filtered_data.loc[:, 'SMA_50'] = filtered_data['Close'].rolling(window=50).mean() # add 50 day sma
-    filtered_data.loc[:, 'Volatility'] = filtered_data['Close'].rolling(window=10).std() # add rolling standard deviation
-    filtered_data.loc[:, 'RSI'] = calculate_rsi(filtered_data) # add rsi
-    filtered_data.loc[:, 'Upper_BB'], filtered_data.loc[:, 'Lower_BB'] = calculate_bollinger_bands(filtered_data) # add bollinger bands
+    # filtered_data.loc[:, 'SMA_10'] = filtered_data['Close'].rolling(window=10).mean() # add 10 day sma
+    # filtered_data.loc[:, 'SMA_50'] = filtered_data['Close'].rolling(window=50).mean() # add 50 day sma
+    # filtered_data.loc[:, 'Volatility'] = filtered_data['Close'].rolling(window=10).std() # add rolling standard deviation
+    # filtered_data.loc[:, 'RSI'] = calculate_rsi(filtered_data) # add rsi
+    # filtered_data.loc[:, 'Upper_BB'], filtered_data.loc[:, 'Lower_BB'] = calculate_bollinger_bands(filtered_data) # add bollinger bands
 
     # Create the target variable (next day's price)
     filtered_data.loc[:, 'Target'] = filtered_data.loc[:, 'Close'].shift(-1)
@@ -59,12 +64,12 @@ def calculate_rsi(data):
 def calculate_bollinger_bands(data):
 
     # Simple Moving Average (20 days)
-    data['SMA_20'] = data['Close'].rolling(window=20).mean()
+    data.loc[:, 'SMA_20'] = data['Close'].rolling(window=20).mean()
     # 20 period standard deviation
-    data['SD_20'] = data['Close'].rolling(window=20).std() # standard deviation
+    data.loc[:, 'SD_20'] = data['Close'].rolling(window=20).std() # standard deviation
 
-    upper_band = data['UB'] = data['SMA_20'] + (2 * data['SD_20']) # upper band = simple moving average + (2 * standard deviation)
-    lower_band = data['LB'] = data['SMA_20'] - (2 * data['SD_20']) # lower band = simple moving average - (2 * standard deviation)
+    upper_band = data.loc[:, 'UB'] = data.loc[:, 'SMA_20'] + (2 * data.loc[:, 'SD_20']) # upper band = simple moving average + (2 * standard deviation)
+    lower_band = data.loc[:, 'LB'] = data.loc[:, 'SMA_20'] - (2 * data.loc[:, 'SD_20']) # lower band = simple moving average - (2 * standard deviation)
     # bollinger_bands = data.dropna()
     return upper_band, lower_band
 

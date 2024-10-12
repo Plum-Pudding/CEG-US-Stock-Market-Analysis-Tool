@@ -26,6 +26,7 @@ from main_ticker import MainPage
 from compare_ticker import ComparePage
 from rank_ticker import RankPage
 from ml_prediction import PredictionPage
+from ml_predict import PredictPage
 
 
 class myApp(QMainWindow):
@@ -50,7 +51,7 @@ class myApp(QMainWindow):
         mainPage1 = MainPage(); #create instances of each page class
         comparePage1 = ComparePage();
         rankPage1 = RankPage();
-        predictionPage1 = PredictionPage();
+        predictionPage1 = PredictPage();
 
         layoutTab1 = QVBoxLayout();
         layoutTab2 = QVBoxLayout();
