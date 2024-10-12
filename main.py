@@ -65,9 +65,9 @@ class myApp(QMainWindow):
         tabRank.setLayout(layoutTab3);
 
         #Tab layouts
-        mainTabs.addTab(tabMain, "Main"); #set tab1 widget as first tab, tab2 as second tab for mainTabs widget
-        mainTabs.addTab(tabCompare, "Compare");
-        mainTabs.addTab(tabRank, "Ranking");
+        mainTabs.addTab(tabMain, "SINGLE"); #set tab1 widget as first tab, tab2 as second tab for mainTabs widget
+        mainTabs.addTab(tabCompare, "COMPARE");
+        mainTabs.addTab(tabRank, "RANKING");
 
         self.setCentralWidget(mainTabs);
 
