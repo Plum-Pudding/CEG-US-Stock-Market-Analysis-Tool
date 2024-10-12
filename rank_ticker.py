@@ -26,13 +26,6 @@ class RankPage(QWidget):
         layout = QVBoxLayout()
         horizontal_layout = QHBoxLayout()
 
-        
-
-
-
-        
-        
-    
 
     def get_stock_tickers(self):
         # fetch tickers from data source dynamically. currently a predefined list

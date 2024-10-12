@@ -1,7 +1,7 @@
 import sys
 import PyQt6 as pyqt6
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QStackedWidget, QScrollArea
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QStackedWidget, QScrollArea, QTabWidget
 from PyQt6.QtGui import QIcon
 import pyqtgraph as pg
 
@@ -27,7 +27,7 @@ from compare_ticker import ComparePage
 from rank_ticker import RankPage
 
 
-class myApp(QWidget):
+class myApp(QMainWindow):
 
     def __init__(self):
         super().__init__()
@@ -37,10 +37,41 @@ class myApp(QWidget):
         self.setWindowIcon(QIcon('icons/barcharticon.png'))
         self.resize(1500,850) # width, height
         
+        #Tabs widget
+        mainTabs = QTabWidget();
+        mainTabs.setTabPosition(QTabWidget.TabPosition.West);
+        mainTabs.setMovable(True);
 
         # Main Layout
         layout = QVBoxLayout()
 
+        mainPage1 = MainPage();
+        comparePage1 = ComparePage();
+        rankPage1 = RankPage();
+
+        layoutTab1 = QVBoxLayout();
+        layoutTab2 = QVBoxLayout();
+        layoutTab3 = QVBoxLayout();
+        layoutTab1.addWidget(mainPage1);
+        layoutTab2.addWidget(comparePage1);
+        layoutTab3.addWidget(rankPage1);
+
+        #Individual tab widgets
+        tabMain = QWidget();
+        tabCompare = QWidget();
+        tabRank = QWidget();
+        tabMain.setLayout(layoutTab1);
+        tabCompare.setLayout(layoutTab2);
+        tabRank.setLayout(layoutTab3);
+
+        #Tab layouts
+        mainTabs.addTab(tabMain, "Main"); #set tab1 widget as first tab, tab2 as second tab for mainTabs widget
+        mainTabs.addTab(tabCompare, "Compare");
+        mainTabs.addTab(tabRank, "Ranking");
+
+        self.setCentralWidget(mainTabs);
+
+        """
         # Top Navigation Buttons
         button_layout = QHBoxLayout()
         self.main_button = QPushButton("View Single Stock")
@@ -95,7 +126,6 @@ class myApp(QWidget):
         self.main_button.clicked.connect(self.show_main_page)
         self.compare_button.clicked.connect(self.show_compare_page)
         self.rank_button.clicked.connect(self.show_rank_page)
-
         
 
     def show_main_page(self):
@@ -109,6 +139,7 @@ class myApp(QWidget):
     def show_rank_page(self):
         '''Switch to the stocks ranking page'''
         self.stacked_widget.setCurrentIndex(2)
+    """
 
 def main():
     
