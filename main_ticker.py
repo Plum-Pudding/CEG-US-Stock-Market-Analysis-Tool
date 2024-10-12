@@ -80,6 +80,13 @@ class MainPage(QWidget):
                                       
         ''')
         self.rsi_button = QPushButton('RSI')
+        self.rsi_button.setStyleSheet('''
+            QPushButton {
+                background-color: #b36b00;             
+                color: white;
+            }
+                                      
+        ''')
         self.bollinger_button = QPushButton('Bollinger Bands')
 
         # summary label config
