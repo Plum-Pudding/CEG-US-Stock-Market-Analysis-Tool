@@ -74,7 +74,7 @@ class PredictionPage(QWidget):
     
     def adjust_period(self, selection): # to showcase the period properly in full form
         # get the time period of stock performance over the days/months/years
-        period_dict = {'5d': '5 days', '1mo': '1 month', '3mo': '3 months', '6mo' : '6 months', '1y': '1 year', '2y' : '2 years', '5y' : '5 years', '10y' : '10 years', 'ytd' : 'year-to-date', 'max':'maximum data'}
+        period_dict = {'1y': '1 year', '2y' : '2 years', '5y' : '5 years', '10y' : '10 years'}
 
         if selection == 'keys':
             return list(period_dict.keys())
@@ -95,6 +95,39 @@ class PredictionPage(QWidget):
             start_year, end_year = current_year - 2, current_year
         else:
             start_year, end_year = current_year - 10, current_year
+
+        # Train model and get predictions (using train_page.py logic)
+        model, X_test, y_test, predictions = train_model_with_filtered_data(selected_ticker, start_year, end_year)
+
+        # plot the actual vs predicted graphs side by side
+        self.plot_side_by_side(selected_ticker, X_test.index, y_test, predictions)
+    
+    def plot_side_by_side(self, ticker, dates, actual_prices, predicted_prices):
+        # Clear existing graphs (in case)
+        self.canvas.figure.clear()
+
+        fig = Figure(figsize=(10, 5))
+        self.canvas.figure = fig
+        # Create subplots for side-by-side comparison
+        ax1, ax2 = fig.subplots(1, 2)
+
+        # plot actual prices on the left
+        ax1.plot(dates, actual_prices, label='Actual Price', color='blue')
+        ax1.set_title(f'{ticker} - Actual Prices')
+        ax1.set_xlabel('Date')
+        ax1.set_ylabel('Price')
+        ax1.legend()
+
+        # plot predicted prices on the right
+        ax2.plot(dates, predicted_prices, label='Predicted Price', color='red')
+        ax2.set_title(f'{ticker} - Predicted Prices')
+        ax2.set_xlabel('Date')
+        ax2.set_ylabel('Price')
+        ax2.legend()
+
+        self.canvas.draw()
+
+    
 
 
 

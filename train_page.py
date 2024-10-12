@@ -8,18 +8,21 @@ def load_and_filter_data(ticker, start_year, end_year):
     # Load the 10 year data from csv
     data = pd.read_csv(f'{ticker}_10y_history.csv', index_col='Date', parse_dates=True)
 
+    # Convert the index to DateTimeIndex and remove timezone info if present
+    data.index = pd.to_datetime(data.index, utc=True).tz_localize(None)
+
     # Filter the data to include only the specified years
     filtered_data = data[(data.index.year >= start_year) & (data.index.year <= end_year)]
 
     # Indicator features (Simple Moving Average, Volatility)
-    filtered_data['SMA_10'] = filtered_data['Close'].rolling(window=10).mean() # add 10 day sma
-    filtered_data['SMA_50'] = filtered_data['Close'].rolling(window=50).mean() # add 50 day sma
-    filtered_data['Volatility'] = filtered_data['Close'].rolling(window=10).std() # add rolling standard deviation
-    filtered_data = calculate_rsi(data) # add rsi
-    filtered_data = calculate_bollinger_bands(data) # add bollinger bands
+    filtered_data.loc[:, 'SMA_10'] = filtered_data['Close'].rolling(window=10).mean() # add 10 day sma
+    filtered_data.loc[:, 'SMA_50'] = filtered_data['Close'].rolling(window=50).mean() # add 50 day sma
+    filtered_data.loc[:, 'Volatility'] = filtered_data['Close'].rolling(window=10).std() # add rolling standard deviation
+    filtered_data.loc[:, 'RSI'] = calculate_rsi(filtered_data) # add rsi
+    filtered_data.loc[:, 'Upper_BB'], filtered_data.loc[:, 'Lower_BB'] = calculate_bollinger_bands(filtered_data) # add bollinger bands
 
     # Create the target variable (next day's price)
-    filtered_data['Target'] = filtered_data['Close'].shift(-1)
+    filtered_data.loc[:, 'Target'] = filtered_data.loc[:, 'Close'].shift(-1)
 
     filtered_data.dropna(inplace=True)
 
@@ -49,8 +52,8 @@ def calculate_rsi(data):
     relative_strength = avg_gain / avg_loss
     rsi = 100 - (100 / (1 + relative_strength))
     rsi = rsi.dropna()
-    data['RSI'] = data.loc[rsi.index]
-    return data
+    # rsi = data.loc[rsi.index]
+    return rsi
 
 # Bollinger Bands Calculation
 def calculate_bollinger_bands(data):
@@ -60,10 +63,10 @@ def calculate_bollinger_bands(data):
     # 20 period standard deviation
     data['SD_20'] = data['Close'].rolling(window=20).std() # standard deviation
 
-    data['UB'] = data['SMA_20'] + (2 * data['SD_20']) # upper band = simple moving average + (2 * standard deviation)
-    data['LB'] = data['SMA_20'] - (2 * data['SD_20']) # lower band = simple moving average - (2 * standard deviation)
-    data = data.dropna()
-    return data
+    upper_band = data['UB'] = data['SMA_20'] + (2 * data['SD_20']) # upper band = simple moving average + (2 * standard deviation)
+    lower_band = data['LB'] = data['SMA_20'] - (2 * data['SD_20']) # lower band = simple moving average - (2 * standard deviation)
+    # bollinger_bands = data.dropna()
+    return upper_band, lower_band
 
 # Train the model
 
