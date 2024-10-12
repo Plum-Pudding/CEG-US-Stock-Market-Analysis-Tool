@@ -76,7 +76,7 @@ class myApp(QMainWindow):
         #Tab order
         mainTabs.addTab(tabMain, "MAIN"); #set tab1 widget as first tab, tab2 as second tab for mainTabs widget
         mainTabs.addTab(tabCompare, "COMPARE");
-        mainTabs.addTab(tabRank, "RANKING");
+        #mainTabs.addTab(tabRank, "RANKING");
         mainTabs.addTab(tabPredict, "PREDICTION");
 
         #Set mainTabs tab widget to the main one

@@ -2,7 +2,7 @@ from cProfile import label
 import sys
 import PyQt6 as pyqt6
 from PyQt6.QtCore import QLine, Qt
-from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QScrollArea
+from PyQt6.QtWidgets import QApplication, QLayout, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QScrollArea
 from PyQt6.QtGui import QIcon
 import pyqtgraph as pg
 
@@ -26,15 +26,16 @@ class RankPage(QWidget):
         # page layout
         layoutBase = QVBoxLayout()
         layoutUIBar = QHBoxLayout()
-        layoutStocksDisplay = QHBoxLayout() 
+        #layoutStocksDisplay = QHBoxLayout() 
         
-        layoutA1 = QVBoxLayout() 
-        layoutA2 = QVBoxLayout() 
-        layoutA3 = QVBoxLayout() 
-        layoutA4 = QVBoxLayout() 
-        layoutA5 = QVBoxLayout() 
+        layoutA1 = QHBoxLayout() 
+        layoutA2 = QHBoxLayout() 
+        layoutA3 = QHBoxLayout() 
+        layoutA4 = QHBoxLayout() 
+        layoutA5 = QHBoxLayout() 
         
-        # User input layout 
+        # User input layout (Fuck this)
+        """
         labelAddStock = QLabel("Add Stock to Ranking")
         lineEditTickerSymbol = QLineEdit()
         lineEditTickerSymbol.setMaxLength(6)
@@ -42,11 +43,17 @@ class RankPage(QWidget):
         
 
         buttonAddStockConfirm = QPushButton("Sample")
+        buttonAddStockConfirm.clicked.connect(self.buttonAddStockConfirm)
         buttonClearList = QPushButton()
 
         layoutUIBar.addWidget(labelAddStock)
         layoutUIBar.addWidget(lineEditTickerSymbol)
         layoutUIBar.addWidget(buttonAddStockConfirm)
+        """
+
+        # get predetermined stock data
+        stockAAPLtemp = yf.Ticker("AAPL")
+        print(stockAAPLtemp.info)
 
         # Stock listing layout
 
@@ -56,10 +63,13 @@ class RankPage(QWidget):
         self.setLayout(layoutBase)
 
         # just using the existing stocks-- retrieve 5d performance
-
+    
+    layoutBase1 = QHBoxLayout();
+    layoutC = QHBoxLayout();
         
-    def buttonAddStock():
-
+    def buttonAddStockConfirm(self):
+        print("Confirm button pressed")
+        self.layoutBase1.addLayout(self.layoutC)
         pass;
 
     def get_stock_tickers(self):
