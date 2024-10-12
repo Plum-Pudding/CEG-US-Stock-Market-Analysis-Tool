@@ -19,6 +19,8 @@ import pandas as pd
 import pandas_datareader as web
 import datetime as dt
 
+#from main import main
+
 class MainPage(QWidget):
     def __init__(self):
         super().__init__()
@@ -173,7 +175,7 @@ class MainPage(QWidget):
     
     def isValidTickerSymbol(givenSymbol):
         #Check if stock ticker symbol is a real one
-        if givenSymbol in main
+        #if givenSymbol in 
             
         pass;
     

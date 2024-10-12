@@ -110,7 +110,8 @@ class myApp(QWidget):
         '''Switch to the stocks ranking page'''
         self.stacked_widget.setCurrentIndex(2)
 
-if __name__ == "__main__":
+def main():
+    
     #pre-load ticker csv to a list
     with open("stockTickerSymbols.csv") as i1:
         tickerSymbolsList = [row.split()[0] for row in i1];
@@ -134,3 +135,8 @@ if __name__ == "__main__":
     window = myApp()
     window.show()  # to display the window
     sys.exit(app.exec())  # to exit
+
+    pass;
+
+if __name__ == "__main__":
+    main();
