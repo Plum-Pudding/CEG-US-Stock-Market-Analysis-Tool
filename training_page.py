@@ -34,7 +34,7 @@ def load_data(ticker):
 # Build LSTM model
 def build_lstm_model():
     model = Sequential()
-    model.add(LSTM(units=50, return_sequences=True, input_shape=(60,1)))
+    model.add(LSTM(units=50, return_sequences=True, input_shape=(60,1))) # past 60 days stock prices, and 1 feature (closing price of the stock)
     model.add(Dropout(0.2))
 
     model.add(LSTM(units=50, return_sequences=True))
