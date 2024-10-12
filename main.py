@@ -25,6 +25,7 @@ import datetime as dt
 from main_ticker import MainPage
 from compare_ticker import ComparePage
 from rank_ticker import RankPage
+from ml_prediction import PredictionPage
 
 
 class myApp(QMainWindow):
@@ -38,37 +39,45 @@ class myApp(QMainWindow):
         self.resize(1500,850) # width, height
         
         #Tabs widget
-        mainTabs = QTabWidget();
-        mainTabs.setTabPosition(QTabWidget.TabPosition.West);
-        mainTabs.setMovable(True);
+        mainTabs = QTabWidget(); #Create base tab widget
+        mainTabs.setTabPosition(QTabWidget.TabPosition.West); #Put the tabs on the left(west) side
+        mainTabs.setMovable(True); #Allow user to drag and drop tabs
 
         # Main Layout
         layout = QVBoxLayout()
 
-        mainPage1 = MainPage();
+        #Individual tab layouts
+        mainPage1 = MainPage(); #create instances of each page class
         comparePage1 = ComparePage();
         rankPage1 = RankPage();
+        predictionPage1 = PredictionPage();
 
         layoutTab1 = QVBoxLayout();
         layoutTab2 = QVBoxLayout();
         layoutTab3 = QVBoxLayout();
-        layoutTab1.addWidget(mainPage1);
+        layoutTab4 = QVBoxLayout();
+        layoutTab1.addWidget(mainPage1); #Put the page widgets in layouts
         layoutTab2.addWidget(comparePage1);
         layoutTab3.addWidget(rankPage1);
+        layoutTab4.addWidget(predictionPage1);
 
         #Individual tab widgets
-        tabMain = QWidget();
+        tabMain = QWidget(); #Creating tab widgets
         tabCompare = QWidget();
         tabRank = QWidget();
-        tabMain.setLayout(layoutTab1);
+        tabPredict = QWidget();
+        tabMain.setLayout(layoutTab1); #Setting tabs to layout with page widgets
         tabCompare.setLayout(layoutTab2);
         tabRank.setLayout(layoutTab3);
+        tabPredict.setLayout(layoutTab4);
 
-        #Tab layouts
+        #Tab order
         mainTabs.addTab(tabMain, "Main"); #set tab1 widget as first tab, tab2 as second tab for mainTabs widget
         mainTabs.addTab(tabCompare, "Compare");
         mainTabs.addTab(tabRank, "Ranking");
+        mainTabs.addTab(tabPredict, "Prediction");
 
+        #Set mainTabs tab widget to the main one
         self.setCentralWidget(mainTabs);
 
 def main():
