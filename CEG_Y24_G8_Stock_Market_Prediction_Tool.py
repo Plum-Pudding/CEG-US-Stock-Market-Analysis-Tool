@@ -60,7 +60,7 @@ def main1():
     print(testDataHistList_Closing);
     print(testDataHistList_Date); #haha
     
-    #TODO: FIGURE OUT HOW TO USE GRAPHICS-LAYOUT
+    #TODO: FIGURE OUT HOW TO USE GRAPHICS-LAYOUT #We're outta time, gonna stick to matplotlib by hanif
 
     #TODO: Add user input textbox to enter stock ticker symbols (AAPL, TSLA, etc), button to confirm, textboxes for period 
     #TODO: Ticker symbol validation using the csv.

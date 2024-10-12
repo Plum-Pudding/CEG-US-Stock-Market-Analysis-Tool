@@ -240,7 +240,7 @@ class MainPage(QWidget):
             # Plot Line Graph
             ax.plot(history.index, history['Close'], label = 'Close Price', color='blue')
             # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
-            ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full}')
+            ax.set_title(f'{stock_info.get("longName")} ({selected_stock}) Stock Price in {period_full}')
             ax.set_xlabel('Date')
             ax.set_ylabel('Close Price')
             ax.legend(loc = 'upper left')
@@ -248,7 +248,7 @@ class MainPage(QWidget):
         elif selected_graph_type == 'Candlestick':
             # Plot candlestick
             mpf.plot(history, type='candle', ax=ax, style='yahoo')
-            ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full}')
+            ax.set_title(f'{stock_info.get("longName")} ({selected_stock}) Stock Price in {period_full}')
             
         # ADD SMA (SIMPLE MOVING AVERAGE) IF SELECTED
         if self.show_sma:
