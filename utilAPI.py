@@ -21,3 +21,4 @@ def yFinGetHist(stockCode, periodHist, intervalTime):
 
 def testFunc():
     return 0;
+

@@ -1,4 +1,6 @@
 import sys
+import csv
+
 import PyQt6 as pyqt6
 from PyQt6.QtCore import Qt, QAbstractTableModel
 from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QScrollArea, QTableView
@@ -168,7 +170,12 @@ class MainPage(QWidget):
         tickers = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA', 'AMD', 'INTC', 'META', 'JPM', 'V', 'JNJ', 'PG', 'KO', 'PFE', 'XOM', 'DIS', 'PEP', 'T', 'NFLX']
         sorted_tickers = sorted(tickers)
         return sorted(sorted_tickers)
-
+    
+    def isValidTickerSymbol(givenSymbol):
+        #Check if stock ticker symbol is a real one
+        if givenSymbol in main
+            
+        pass;
     
     def adjust_period(self, selection): # to showcase the period properly in full form
         # get the time period of stock performance over the days/months/years

@@ -51,7 +51,7 @@ def main1():
     #Retrieve test stock data
     
     testDataHist = pandas.DataFrame();
-    testDataHist = utilAPI.yFinGetHist("TSLA","max", "1d");
+    testDataHist = utilAPI.yFinGetHist("TSLA","5d", "1d");
 
     testDataHistList_Closing = testDataHist["Close"].values.tolist();
     #testDataHistList_Date = testDataHist[testDataHist.columns[0]].values.tolist(); #dates column is empty on row 0, "Date" on row 1, data on row 2 onwards
@@ -206,6 +206,10 @@ def main1():
         #Events
         def buttonAbleClicked(self):
             print("Button Able clicked.");
+
+    with open("stockTickerSymbols.csv") as f1:
+        tickerSymbolsList = [row.split()[0] for row in f1];
+    print(tickerSymbolsList);
 
     window = mainWindow();
     window.show();

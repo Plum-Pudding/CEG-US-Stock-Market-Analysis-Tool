@@ -111,6 +111,11 @@ class myApp(QWidget):
         self.stacked_widget.setCurrentIndex(2)
 
 if __name__ == "__main__":
+    #pre-load ticker csv to a list
+    with open("stockTickerSymbols.csv") as i1:
+        tickerSymbolsList = [row.split()[0] for row in i1];
+    #print(tickerSymbolsList);
+
     app = QApplication(sys.argv)
     app.setStyleSheet('''
         QWidget {
@@ -125,6 +130,7 @@ if __name__ == "__main__":
             color: white
         }
     ''')
+
     window = myApp()
     window.show()  # to display the window
     sys.exit(app.exec())  # to exit
