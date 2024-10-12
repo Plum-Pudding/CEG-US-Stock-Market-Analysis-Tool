@@ -1,3 +1,4 @@
+import random
 import sys
 import PyQt6 as pyqt6
 from PyQt6.QtCore import Qt
@@ -95,6 +96,10 @@ class myApp(QMainWindow):
                 background: #36454F;  /* Color when mouse hovers over the tab */
             }
         """)
+
+def coinFlip():
+    #Probably actually the most accurate advisor, let's be honest here
+    return random.randint(0,1);
 
 def main():
     
