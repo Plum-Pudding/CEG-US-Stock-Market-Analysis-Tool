@@ -72,13 +72,29 @@ class myApp(QMainWindow):
         tabPredict.setLayout(layoutTab4);
 
         #Tab order
-        mainTabs.addTab(tabMain, "Main"); #set tab1 widget as first tab, tab2 as second tab for mainTabs widget
-        mainTabs.addTab(tabCompare, "Compare");
-        mainTabs.addTab(tabRank, "Ranking");
-        mainTabs.addTab(tabPredict, "Prediction");
+        mainTabs.addTab(tabMain, "MAIN"); #set tab1 widget as first tab, tab2 as second tab for mainTabs widget
+        mainTabs.addTab(tabCompare, "COMPARE");
+        mainTabs.addTab(tabRank, "RANKING");
+        mainTabs.addTab(tabPredict, "PREDICTION");
 
         #Set mainTabs tab widget to the main one
         self.setCentralWidget(mainTabs);
+
+        mainTabs.setStyleSheet("""
+            QTabBar::tab {
+                background: lightgray;
+                padding: 15px;
+            }
+            QTabBar::tab:selected {
+                background: #36454F;  /* Color of selected tab */
+            }
+            QTabBar::tab:!selected {
+                background: #191970;  /* Color of unselected tab */
+            }
+            QTabBar::tab:hover {
+                background: #36454F;  /* Color when mouse hovers over the tab */
+            }
+        """)
 
 def main():
     
