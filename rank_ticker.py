@@ -1,6 +1,6 @@
 import sys
 import PyQt6 as pyqt6
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import QLine, Qt
 from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QScrollArea
 from PyQt6.QtGui import QIcon
 import pyqtgraph as pg
@@ -23,13 +23,30 @@ class RankPage(QWidget):
         super().__init__()
 
         # page layout
-        layout = QVBoxLayout()
-        horizontal_layout = QHBoxLayout()
+        layoutBase = QVBoxLayout()
+        layoutUI = QHBoxLayout()
+        layoutStocksDisplay = QHBoxLayout() 
+        
+        layoutA1 = QVBoxLayout() 
+        layoutA2 = QVBoxLayout() 
+        layoutA3 = QVBoxLayout() 
+        layoutA4 = QVBoxLayout() 
+        layoutA5 = QVBoxLayout() 
+        
+        # User input layout 
+        labelAddStock = QLabel("Add Stock to Ranking")
+        lineEditTickerSymbol = QLineEdit()
+        lineEditTickerSymbol.setMaxLength(6)
+        lineEditTickerSymbol.setPlaceholderText("AAPL, MSFT, GOOGL, etc.")
 
-        #pre-load ticker csv to a list
-        with open("stockTickerSymbols.csv") as i1:
-            tickerSymbolsList = [row.split()[0] for row in i1];
-        #print(tickerSymbolsList);
+        buttonAddStockConfirm = QPushButton()
+        buttonClearList = QPushButton()
+
+        #layoutUI.addWidget()
+
+        # just using the existing stocks-- retrieve 5d performance
+
+        
 
 
     def get_stock_tickers(self):
@@ -38,11 +55,17 @@ class RankPage(QWidget):
         sorted_tickers = sorted(tickers)
         return sorted(sorted_tickers)
 
-    def isValidTickerSymbol(givenSymbol): #Check is given string is in stockTickerSymbols.csv i.e. is a real stock
+    def isValidTickerSymbol(givenSymbol): #Return true if string is in stockTickerSymbols.csv i.e. is a real stock
+        #Load ticker csv to a list-- Yes I know this is inefficient as fuck but oh well
+        with open("stockTickerSymbols.csv") as i1:
+            tickerSymbolsList = [row.split()[0] for row in i1];
+        #print(tickerSymbolsList);
 
+        if givenSymbol in tickerSymbolsList:
+            return(True);
+        else:
+            return(False);
         
-
-        return (True);
 
     def plot_bar_graph(self):
         
