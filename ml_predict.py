@@ -94,6 +94,7 @@ class PredictPage(QWidget):
         
 
     def plot_stock_data(self):
+        # selects ticker name and period selected from the dropdown box
         selected_ticker = self.ticker_combo.currentText()
         selected_period = self.period_combo.currentText()
 
@@ -119,10 +120,11 @@ class PredictPage(QWidget):
         filtered_data = df[(df['Date'] >= f'{start_year}-01-01') & (df['Date'] <= f'{end_year}-12-31')]
 
 
+        # initiialize training of model and write a model (keras file) of the prediction written in the file ({ticker}_model.keras)
         train_model(selected_ticker)
 
         # Load model and make predictions
-        model = load_model(f'{selected_ticker}_model.keras')
+        model = load_model(f'{selected_ticker}_model.keras') 
 
 
         scaler = MinMaxScaler(feature_range=(0,1))
@@ -136,8 +138,6 @@ class PredictPage(QWidget):
 
         X_test = np.array(X_test)
         X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))  # reshape for LSTM
-
-
 
         predictions = model.predict(X_test)
         predictions = scaler.inverse_transform(predictions) # rescale predictions
