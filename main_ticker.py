@@ -27,6 +27,7 @@ class MainPage(QWidget):
         evaluation_layout = QVBoxLayout()
         summary_layout = QVBoxLayout()
         hist_layout = QVBoxLayout()
+        sma_layout = QVBoxLayout()
 
         # dropdown list to select ticker
         self.ticker_combo = QComboBox()
@@ -71,7 +72,8 @@ class MainPage(QWidget):
         ''')
 
         # matplotlib canvas to display graphs
-        self.canvas = FigureCanvas(plt.figure()) 
+        self.canvas = FigureCanvas(plt.figure())
+        
 
         # set layout to main window
         self.setLayout(layout)
@@ -112,6 +114,9 @@ class MainPage(QWidget):
         self.setLayout(summary_layout)
         summary_layout.addWidget(self.summary_label)
         scroll_layout.addLayout(summary_layout)
+
+        # Other Indicators
+
         
         scroll_area.setWidget(scroll_widget)
         layout.addWidget(scroll_area)
@@ -158,18 +163,19 @@ class MainPage(QWidget):
         data['SMA_50'] = data['Close'].rolling(window=50).mean()  # 50-day SMA
 
         # Calculate E
-        data['EMA_10'] = data['Close'].ewm(span=10, adjust=False).mean()  # 10-day EMA
+        # data['EMA_10'] = data['Close'].ewm(span=10, adjust=False).mean()  # 10-day EMA
         
         # creating and plotting of graph
         self.canvas.figure.clear() # clear any existing graph in case
         ax = self.canvas.figure.add_subplot(111)
-        ax.plot(history.index, history['Close'], label = 'Close Price', color='blue')
+        ax.plot(history.index, history['Close'], label = 'Close Price', color='#006A4E')
         ax.plot(data.index, data['SMA_10'], label='10-Day SMA', color='red')
         ax.plot(data.index, data['SMA_50'], label='50-Day SMA', color='green')
         # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
-        ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full} with 10-Day and 50-Day Simple Moving Averages')
+        ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full}')
         ax.set_xlabel('Date')
         ax.set_ylabel('Close Price')
+        ax.set_facecolor('black')
         ax.legend()
         self.canvas.draw()
 
@@ -181,6 +187,7 @@ class MainPage(QWidget):
         # display stock information
         stock_summary = stock_info.get('longBusinessSummary')
         self.summary_label.setText(f'Company summary:\n{stock_summary}')
+
 
 
     def plot_bargraph_data(self):
