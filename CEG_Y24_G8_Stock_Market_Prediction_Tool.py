@@ -1,3 +1,21 @@
+"""
+
+
+
+
+
+**************************
+
+DEPRECATED
+
+**************************
+
+
+
+
+
+"""
+
 #system-- check if we still need some of these, pretty sure we don't
 from ast import main
 from ipaddress import ip_interface
@@ -51,7 +69,7 @@ def main1():
     #Retrieve test stock data
     
     testDataHist = pandas.DataFrame();
-    testDataHist = utilAPI.yFinGetHist("TSLA","max", "1d");
+    testDataHist = utilAPI.yFinGetHist("TSLA","5d", "1d");
 
     testDataHistList_Closing = testDataHist["Close"].values.tolist();
     #testDataHistList_Date = testDataHist[testDataHist.columns[0]].values.tolist(); #dates column is empty on row 0, "Date" on row 1, data on row 2 onwards
@@ -60,7 +78,7 @@ def main1():
     print(testDataHistList_Closing);
     print(testDataHistList_Date); #haha
     
-    #TODO: FIGURE OUT HOW TO USE GRAPHICS-LAYOUT
+    #TODO: FIGURE OUT HOW TO USE GRAPHICS-LAYOUT #We're outta time, gonna stick to matplotlib by hanif
 
     #TODO: Add user input textbox to enter stock ticker symbols (AAPL, TSLA, etc), button to confirm, textboxes for period 
     #TODO: Ticker symbol validation using the csv.
@@ -206,6 +224,10 @@ def main1():
         #Events
         def buttonAbleClicked(self):
             print("Button Able clicked.");
+
+    with open("stockTickerSymbols.csv") as f1:
+        tickerSymbolsList = [row.split()[0] for row in f1];
+    print(tickerSymbolsList);
 
     window = mainWindow();
     window.show();

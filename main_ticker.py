@@ -1,4 +1,6 @@
 import sys
+import csv
+
 import PyQt6 as pyqt6
 from PyQt6.QtCore import Qt, QAbstractTableModel
 from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QScrollArea, QTableView
@@ -6,6 +8,7 @@ from PyQt6.QtGui import QIcon
 import pyqtgraph as pg
 
 import yfinance as yf # Yahoo! Finance API to get data on stocks
+import mplfinance as mpf # for candlesticks graph purposes
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # for matplotlib to work with PyQt6
 import matplotlib.pyplot as plt
@@ -15,6 +18,8 @@ import numpy as np
 import pandas as pd
 import pandas_datareader as web
 import datetime as dt
+
+#from main import main
 
 class MainPage(QWidget):
     def __init__(self):
@@ -27,7 +32,6 @@ class MainPage(QWidget):
         evaluation_layout = QVBoxLayout()
         summary_layout = QVBoxLayout()
         hist_layout = QVBoxLayout()
-        sma_layout = QVBoxLayout()
 
         # dropdown list to select ticker
         self.ticker_combo = QComboBox()
@@ -38,6 +42,10 @@ class MainPage(QWidget):
         self.period_combo = QComboBox()
         period = self.adjust_period('keys')
         self.period_combo.addItems(period)
+
+        # dropdown menu for graph type
+        self.graph_type_combo = QComboBox()
+        self.graph_type_combo.addItems(['Line Graph', 'Candlestick'])
 
         # just a label
         self.label = QLabel('SELECT A STOCK TO VIEW DATA')
@@ -53,6 +61,34 @@ class MainPage(QWidget):
             font-family: verdana;
             font-weight: bold;                  
         ''')
+
+        # Indicator Buttons
+        button_layout = QHBoxLayout()
+        self.sma_button = QPushButton('SMA')
+        self.sma_button.setStyleSheet('''
+            QPushButton {
+                background-color: #086900;             
+                color: white;
+            }
+                                      
+        ''')
+        self.sma_200_button = QPushButton('SMA (100 days and 200 days)')
+        self.sma_200_button.setStyleSheet('''
+            QPushButton {
+                background-color: #330066;             
+                color: white;
+            }
+                                      
+        ''')
+        self.rsi_button = QPushButton('RSI')
+        self.rsi_button.setStyleSheet('''
+            QPushButton {
+                background-color: #b36b00;             
+                color: white;
+            }
+                                      
+        ''')
+        self.bollinger_button = QPushButton('Bollinger Bands')
 
         # summary label config
         self.summary_label = QLabel()
@@ -78,13 +114,34 @@ class MainPage(QWidget):
         # set layout to main window
         self.setLayout(layout)
 
+        # Indicator buttons to connect to their functions
+        self.sma_button.clicked.connect(self.toggle_sma)
+        self.sma_200_button.clicked.connect(self.toggle_sma_200)
+        self.rsi_button.clicked.connect(self.toggle_rsi)
+        self.bollinger_button.clicked.connect(self.toggle_bollinger_bands)
+
         # click button to connect to get stock data
         self.plotButton.clicked.connect(self.plot_stock_data)
 
+        # flags for showing indicators
+        self.show_sma = False
+        self.show_sma_200 = False
+        self.show_rsi = False
+        self.show_bollinger = False
 
         ''' layout section to add widgets. (add widgets to QVBoxLayout and make them appear) '''
         # graph layout
         layout.addWidget(self.canvas)
+
+        layout.addWidget(self.graph_type_combo)
+
+        # Indicator buttons
+        button_layout.addWidget(self.sma_button)
+        button_layout.addWidget(self.sma_200_button)
+        button_layout.addWidget(self.rsi_button)
+        button_layout.addWidget(self.bollinger_button)
+
+        layout.addLayout(button_layout)
 
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
@@ -127,7 +184,12 @@ class MainPage(QWidget):
         tickers = ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'AMZN', 'NVDA', 'AMD', 'INTC', 'META', 'JPM', 'V', 'JNJ', 'PG', 'KO', 'PFE', 'XOM', 'DIS', 'PEP', 'T', 'NFLX']
         sorted_tickers = sorted(tickers)
         return sorted(sorted_tickers)
-
+    
+    def isValidTickerSymbol(givenSymbol):
+        #Check if stock ticker symbol is a real one
+        #if givenSymbol in 
+            
+        pass;
     
     def adjust_period(self, selection): # to showcase the period properly in full form
         # get the time period of stock performance over the days/months/years
@@ -139,9 +201,31 @@ class MainPage(QWidget):
             return list(period_dict.values())
         elif selection == 'all':
             return period_dict
+        
+    ''' ============ INDICATORS FUNCTIONS ============'''
+
+    def toggle_sma(self):
+        self.show_sma = not self.show_sma
+        self.plot_stock_data()
+
+    def toggle_sma_200(self):
+        self.show_sma_200 = not self.show_sma_200
+        self.plot_stock_data()
+    
+    def toggle_rsi(self):
+        self.show_rsi = not self.show_rsi
+        self.plot_stock_data()
+
+    def toggle_bollinger_bands(self):
+        self.show_bollinger = not self.show_bollinger
+        self.plot_stock_data()
+
+
+    ''' ============ GRAPH PLOTTING CODES ============'''
 
     def plot_stock_data(self):
 
+        # GET SELECTED STOCKS AND PERIOD
         selected_stock = self.ticker_combo.currentText() # pulls the stock selected in the dropdown list
         stock = yf.Ticker(selected_stock)
         stock_info = stock.info
@@ -152,9 +236,7 @@ class MainPage(QWidget):
                 period_full = value
         self.period_label.setText(f'Period: {period_full}')
 
-
         # historical data for selected stock. 1mo = 30/31 days, 1y = 1 year, max: from the beginning
-        stock = yf.Ticker(selected_stock)
         history = stock.history(period = selected_period)
         data = stock.history(period = selected_period) # for SMA
 
@@ -163,19 +245,18 @@ class MainPage(QWidget):
         data['SMA_50'] = data['Close'].rolling(window=50).mean()  # 50-day SMA
 
         # Calculate E
-        # data['EMA_10'] = data['Close'].ewm(span=10, adjust=False).mean()  # 10-day EMA
+        data['EMA_10'] = data['Close'].ewm(span=10, adjust=False).mean()  # 10-day EMA
         
         # creating and plotting of graph
         self.canvas.figure.clear() # clear any existing graph in case
         ax = self.canvas.figure.add_subplot(111)
-        ax.plot(history.index, history['Close'], label = 'Close Price', color='#006A4E')
+        ax.plot(history.index, history['Close'], label = 'Close Price', color='blue')
         ax.plot(data.index, data['SMA_10'], label='10-Day SMA', color='red')
         ax.plot(data.index, data['SMA_50'], label='50-Day SMA', color='green')
         # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
-        ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full}')
+        ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full} with 10-Day and 50-Day Simple Moving Averages')
         ax.set_xlabel('Date')
         ax.set_ylabel('Close Price')
-        ax.set_facecolor('black')
         ax.legend()
         self.canvas.draw()
 

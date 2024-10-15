@@ -399,3 +399,5 @@ FodyWeavers.xsd
 /testignore.txt
 /vendor/
 /envCEG2/
+/dist/
+/build/
