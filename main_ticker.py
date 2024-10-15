@@ -31,7 +31,6 @@ class MainPage(QWidget):
         ticker_period_label_layout = QHBoxLayout()
         evaluation_layout = QVBoxLayout()
         summary_layout = QVBoxLayout()
-        hist_layout = QVBoxLayout()
 
         # dropdown list to select ticker
         self.ticker_combo = QComboBox()
@@ -108,8 +107,7 @@ class MainPage(QWidget):
         ''')
 
         # matplotlib canvas to display graphs
-        self.canvas = FigureCanvas(plt.figure())
-        
+        self.canvas = FigureCanvas(plt.figure()) 
 
         # set layout to main window
         self.setLayout(layout)
@@ -171,9 +169,6 @@ class MainPage(QWidget):
         self.setLayout(summary_layout)
         summary_layout.addWidget(self.summary_label)
         scroll_layout.addLayout(summary_layout)
-
-        # Other Indicators
-
         
         scroll_area.setWidget(scroll_widget)
         layout.addWidget(scroll_area)
@@ -240,24 +235,105 @@ class MainPage(QWidget):
         history = stock.history(period = selected_period)
         data = stock.history(period = selected_period) # for SMA
 
-        # Calculate Simple Moving Averages (SMA)
-        data['SMA_10'] = data['Close'].rolling(window=10).mean()  # 10-day SMA
-        data['SMA_50'] = data['Close'].rolling(window=50).mean()  # 50-day SMA
-
-        # Calculate E
+        # Calculate EMA
         data['EMA_10'] = data['Close'].ewm(span=10, adjust=False).mean()  # 10-day EMA
         
         # creating and plotting of graph
         self.canvas.figure.clear() # clear any existing graph in case
-        ax = self.canvas.figure.add_subplot(111)
-        ax.plot(history.index, history['Close'], label = 'Close Price', color='blue')
-        ax.plot(data.index, data['SMA_10'], label='10-Day SMA', color='red')
-        ax.plot(data.index, data['SMA_50'], label='50-Day SMA', color='green')
-        # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
-        ax.set_title(f'{stock_info.get('longName')} ({selected_stock}) Stock Price in {period_full} with 10-Day and 50-Day Simple Moving Averages')
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Close Price')
-        ax.legend()
+        # ax = self.canvas.figure.add_subplot(111)
+
+        # check whether RSi is showing as RSI is indicated below the main graph, thus expanding the canvas is needed
+        if self.show_rsi:
+            ax, ax2 = self.canvas.figure.subplots(2, sharex=True, gridspec_kw={'height_ratios': [3,1]})
+        else:
+            ax = self.canvas.figure.add_subplot(111)
+
+
+        # Determine type of graph selected
+        selected_graph_type = self.graph_type_combo.currentText()
+
+        if selected_graph_type == 'Line Graph':
+            # Plot Line Graph
+            ax.plot(history.index, history['Close'], label = 'Close Price', color='blue')
+            # ax.plot(data.index, data['EMA_10'], label='10-Day EMA', color= 'yellow')
+            ax.set_title(f'{stock_info.get("longName")} ({selected_stock}) Stock Price in {period_full}')
+            ax.set_xlabel('Date')
+            ax.set_ylabel('Close Price')
+            ax.legend(loc = 'upper left')
+
+        elif selected_graph_type == 'Candlestick':
+            # Plot candlestick
+            mpf.plot(history, type='candle', ax=ax, style='yahoo')
+            ax.set_title(f'{stock_info.get("longName")} ({selected_stock}) Stock Price in {period_full}')
+            
+        # ADD SMA (SIMPLE MOVING AVERAGE) IF SELECTED
+        if self.show_sma:
+            # Calculate Simple Moving Averages (SMA)
+            data['SMA_10'] = data['Close'].rolling(window=10).mean()  # 10-day SMA
+            data['SMA_50'] = data['Close'].rolling(window=50).mean()  # 50-day SMA
+            ax.plot(data.index, data['SMA_10'], label='10-Day SMA', color='red')
+            ax.plot(data.index, data['SMA_50'], label='50-Day SMA', color='green')
+            ax.legend(loc='upper left')
+
+        # ADD SMA FOR 100 - 200 DAYS IF SELECTED
+        if self.show_sma_200:
+            # Calculate Simple Moving Averages (SMA)
+            data['SMA_100'] = data['Close'].rolling(window=100).mean()  # 100-day SMA
+            data['SMA_200'] = data['Close'].rolling(window=200).mean()  # 200-day SMA
+            ax.plot(data.index, data['SMA_100'], label='100-Day SMA', color='orange')
+            ax.plot(data.index, data['SMA_200'], label='200-Day SMA', color='purple')
+            ax.legend(loc='upper left')
+        
+        # ADD RSI (RELATIVE STRENGTH INDEX) IF SELECTED
+        if self.show_rsi:
+            # Calculate Relative Strength Index (RSI)
+            delta = history['Close'].diff(1)
+            delta.dropna(inplace=True) # drop the "not a number" values
+
+            postive = delta.copy()
+            negative = delta.copy()
+
+            postive[postive < 0] = 0
+            negative[negative > 0] = 0
+
+            # RSI is calculated over a 14-day period
+            days = 14
+
+            # Relative Strength Calculation
+            avg_gain = postive.rolling(window=days).mean()
+            avg_loss = abs(negative.rolling(window=days).mean()) # absolute value as we need a positive value when knowing the absolute difference
+
+            relative_strength = avg_gain / avg_loss
+            rsi = 100 - (100 / (1 + relative_strength))
+            rsi = rsi.dropna()
+            history_rsi = history.loc[rsi.index]
+
+            # ax2 = ax.twinx()
+            ax2.plot(history_rsi.index, rsi, label='RSI', color='orange')
+            ax2.axhline(70, color='red', linestyle='--') # "financial experts" claimed that between 70 and 30 is important. 30 oversold, 70 overbought.
+            ax2.axhline(30, color='green', linestyle='--')
+            ax2.set_ylim(0,100)
+            ax2.set_ylabel('RSI')
+            ax2.legend()
+
+
+        if self.show_bollinger:
+            data['SMA'] = data['Close'].rolling(window=20).mean() # Simple Moving Average (20 days)
+            # 20 period standard deviation
+            data['SD'] = data['Close'].rolling(window=20).std() # standard deviation
+
+            data['UB'] = data['SMA'] + (2 * data['SD']) # upper band = simple moving average + (2 * standard deviation)
+            data['LB'] = data['SMA'] - (2 * data['SD']) # lower band = simple moving average - (2 * standard deviation)
+            data = data.dropna()
+
+            ax.plot(data.index, data['UB'], label='Upper Bollinger Band', color='red')
+            ax.plot(data.index, data['LB'], label='Lower Bollinger Band', color='green')
+            ax.fill_between(data.index, data['UB'], data['LB'], color='lightgray')
+            ax.plot(data.index, data['SMA'], label='Middle Bollinger Band', color='orange')
+
+            ax.legend(loc='upper left')
+
+
         self.canvas.draw()
 
         # display buy evaluation
@@ -268,7 +344,6 @@ class MainPage(QWidget):
         # display stock information
         stock_summary = stock_info.get('longBusinessSummary')
         self.summary_label.setText(f'Company summary:\n{stock_summary}')
-
 
 
     def plot_bargraph_data(self):

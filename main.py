@@ -53,31 +53,37 @@ class myApp(QMainWindow):
         comparePage1 = ComparePage();
         rankPage1 = RankPage();
         predictionPage1 = PredictPage();
+        predictionPage2 = PredictionPage()
 
         layoutTab1 = QVBoxLayout();
         layoutTab2 = QVBoxLayout();
         layoutTab3 = QVBoxLayout();
         layoutTab4 = QVBoxLayout();
+        layoutTab5 = QVBoxLayout()
         layoutTab1.addWidget(mainPage1); #Put the page widgets in layouts
         layoutTab2.addWidget(comparePage1);
         layoutTab3.addWidget(rankPage1);
         layoutTab4.addWidget(predictionPage1);
+        layoutTab5.addWidget(predictionPage2)
 
         #Individual tab widgets
         tabMain = QWidget(); #Creating tab widgets
         tabCompare = QWidget();
         tabRank = QWidget();
         tabPredict = QWidget();
+        tabPrediction = QWidget()
         tabMain.setLayout(layoutTab1); #Setting tabs to layout with page widgets
         tabCompare.setLayout(layoutTab2);
         tabRank.setLayout(layoutTab3);
         tabPredict.setLayout(layoutTab4);
+        tabPrediction.setLayout(layoutTab5)
 
         #Tab order
         mainTabs.addTab(tabMain, "MAIN"); #set tab1 widget as first tab, tab2 as second tab for mainTabs widget
         mainTabs.addTab(tabCompare, "COMPARE");
         #mainTabs.addTab(tabRank, "RANKING");
         mainTabs.addTab(tabPredict, "PREDICTION");
+        mainTabs.addTab(tabPrediction, "FAILED PREDICTION")
 
         #Set mainTabs tab widget to the main one
         self.setCentralWidget(mainTabs);

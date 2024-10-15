@@ -20,11 +20,11 @@ def load_and_filter_data(ticker, start_year, end_year):
     filtered_data = data[(data.index.year >= start_year) & (data.index.year <= end_year)]
 
     # Indicator features (Simple Moving Average, Volatility)
-    # filtered_data.loc[:, 'SMA_10'] = filtered_data['Close'].rolling(window=10).mean() # add 10 day sma
-    # filtered_data.loc[:, 'SMA_50'] = filtered_data['Close'].rolling(window=50).mean() # add 50 day sma
-    # filtered_data.loc[:, 'Volatility'] = filtered_data['Close'].rolling(window=10).std() # add rolling standard deviation
-    # filtered_data.loc[:, 'RSI'] = calculate_rsi(filtered_data) # add rsi
-    # filtered_data.loc[:, 'Upper_BB'], filtered_data.loc[:, 'Lower_BB'] = calculate_bollinger_bands(filtered_data) # add bollinger bands
+    filtered_data.loc[:, 'SMA_10'] = filtered_data['Close'].rolling(window=10).mean() # add 10 day sma
+    filtered_data.loc[:, 'SMA_50'] = filtered_data['Close'].rolling(window=50).mean() # add 50 day sma
+    filtered_data.loc[:, 'Volatility'] = filtered_data['Close'].rolling(window=10).std() # add rolling standard deviation
+    filtered_data.loc[:, 'RSI'] = calculate_rsi(filtered_data) # add rsi
+    filtered_data.loc[:, 'Upper_BB'], filtered_data.loc[:, 'Lower_BB'] = calculate_bollinger_bands(filtered_data) # add bollinger bands
 
     # Create the target variable (next day's price)
     filtered_data.loc[:, 'Target'] = filtered_data.loc[:, 'Close'].shift(-1)
